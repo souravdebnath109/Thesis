@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dhaka Dynamic Path Planner — PSO-ACO Hybrid Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+    <style>
+        /* ============================================================
+           GLOBAL RESET & TYPOGRAPHY
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        header {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            padding: 12px 24px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+            user-select: none;
+        }
+
+        header h1 {
+            font-size: 1.3em;
+            color: #58a6ff;
+            white-space: nowrap;
+        }
+
+        header .subtitle {
+            font-size: 0.78em;
+            color: #8b949e;
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 12px;
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .status-idle      { background: #21262d; color: #8b949e; }
+        .status-running    { background: #0d419d; color: #58a6ff; animation: pulse 1.2s infinite; }
+        .status-complete   { background: #1b4721; color: #3fb950; }
+        .status-rerouting  { background: #6e3404; color: #d29922; animation: pulse 0.6s infinite; }
+        .status-arrived    { background: #1b4721; color: #3fb950; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.6; }
+        }
+
+        /* ============================================================
+           LAYOUT — THREE-COLUMN
+           ============================================================ */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+
+        .panel {
+            background: #161b22;
+            padding: 12px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #30363d #161b22;
+        }
+
+        .panel::-webkit-scrollbar { width: 6px; }
+        .panel::-webkit-scrollbar-track { background: #161b22; }
+        .panel::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+
+        .left-panel {
+            width: 256px;
+            min-width: 256px;
+            border-right: 1px solid #30363d;
+        }
+
+        .right-panel {
+            width: 272px;
+            min-width: 272px;
+            border-left: 1px solid #30363d;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        #canvas-holder {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0d1117;
+            min-height: 0;
+        }
+
+        #canvas-holder canvas {
+            display: block;
+        }
+
+        /* ============================================================
+           LOG AREA
+           ============================================================ */
+        .log-area {
+            height: 115px;
+            min-height: 80px;
+            background: #010409;
+            border-top: 1px solid #30363d;
+            padding: 8px 12px;
+            overflow-y: auto;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.72em;
+            color: #8b949e;
+            line-height: 1.5;
+            scrollbar-width: thin;
+            scrollbar-color: #30363d #010409;
+        }
+
+        .log-area::-webkit-scrollbar { width: 5px; }
+        .log-area::-webkit-scrollbar-track { background: #010409; }
+        .log-area::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+
+        .log-line { white-space: pre-wrap; word-break: break-all; }
+        .log-line.info    { color: #58a6ff; }
+        .log-line.success { color: #3fb950; }
+        .log-line.warn    { color: #d29922; }
+        .log-line.error   { color: #f85149; }
+
+        /* ============================================================
+           PANEL COMPONENTS
+           ============================================================ */
+        .section-title {
+            color: #58a6ff;
+            font-size: 0.78em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 14px 0 6px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .section-title:first-child { margin-top: 0; }
+
+        label {
+            display: block;
+            font-size: 0.76em;
+            color: #8b949e;
+            margin: 5px 0 2px 0;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 5px 8px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            color: #c9d1d9;
+            font-size: 0.82em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: #58a6ff;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 3px 0;
+            accent-color: #58a6ff;
+            cursor: pointer;
+        }
+
+        .range-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .range-val {
+            font-size: 0.72em;
+            color: #58a6ff;
+            min-width: 32px;
+            text-align: right;
+            font-weight: 600;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
+        button {
+            width: 100%;
+            padding: 7px 10px;
+            margin: 3px 0;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        button:hover  { background: #30363d; border-color: #58a6ff; }
+        button:active { transform: scale(0.98); }
+
+        button.primary { background: #238636; border-color: #2ea043; color: #fff; }
+        button.primary:hover { background: #2ea043; }
+
+        button.danger  { background: #da3633; border-color: #f85149; color: #fff; }
+        button.danger:hover  { background: #f85149; }
+
+        button.accent  { background: #1f6feb; border-color: #58a6ff; color: #fff; }
+        button.accent:hover  { background: #388bfd; }
+
+        button.warning { background: #7c4e0a; border-color: #d29922; color: #fff; }
+        button.warning:hover { background: #9e6a03; }
+
+        /* ============================================================
+           METRIC CARDS
+           ============================================================ */
+        .metric-card {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin: 4px 0;
+        }
+
+        .metric-label {
+            font-size: 0.65em;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .metric-value {
+            font-size: 1.25em;
+            color: #58a6ff;
+            font-weight: 700;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        .metric-value.good { color: #3fb950; }
+        .metric-value.warn { color: #d29922; }
+        .metric-value.bad  { color: #f85149; }
+
+        /* ============================================================
+           PATH DISPLAY
+           ============================================================ */
+        .path-display {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin: 4px 0;
+            font-size: 0.76em;
+            word-wrap: break-word;
+            line-height: 1.5;
+            color: #c9d1d9;
+        }
+
+        /* ============================================================
+           PARAMS GRID
+           ============================================================ */
+        .params-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+        }
+
+        .param-box {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 4px;
+            padding: 6px 4px;
+            text-align: center;
+        }
+
+        .param-box .plabel { font-size: 0.62em; color: #8b949e; }
+        .param-box .pvalue {
+            font-size: 1.05em;
+            color: #79c0ff;
+            font-weight: 600;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        /* ============================================================
+           COMPARISON TABLE
+           ============================================================ */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.76em;
+            margin: 6px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 4px 6px;
+            border: 1px solid #21262d;
+            text-align: center;
+        }
+
+        .comparison-table th {
+            background: #21262d;
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           TIME DISPLAY
+           ============================================================ */
+        .time-display {
+            text-align: center;
+            padding: 8px;
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            margin: 4px 0;
+        }
+
+        .time-display .time {
+            font-size: 1.5em;
+            color: #f0883e;
+            font-weight: 700;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        .time-display .tlabel {
+            font-size: 0.68em;
+            color: #8b949e;
+        }
+
+        /* ============================================================
+           LEGEND
+           ============================================================ */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 6px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68em;
+            color: #8b949e;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           KEYBOARD SHORTCUT HELP
+           ============================================================ */
+        .shortcuts-help {
+            font-size: 0.68em;
+            color: #8b949e;
+            line-height: 1.9;
+            margin-top: 4px;
+        }
+
+        .shortcuts-help kbd {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 3px;
+            padding: 1px 5px;
+            font-size: 0.9em;
+            color: #c9d1d9;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1100px) {
+            .left-panel  { width: 220px; min-width: 200px; }
+            .right-panel { width: 230px; min-width: 210px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ================================================================
+     HEADER
+     ================================================================ -->
+<header>
+    <div>
+        <h1>🚦 Dhaka Dynamic Path Planner</h1>
+        <div class="subtitle">PSO-ACO Hybrid · Road Condition Factor R(t) · Real-time Rerouting</div>
+    </div>
+    <span id="status-badge" class="status-badge status-idle">IDLE</span>
+</header>
+
+<!-- ================================================================
+     MAIN THREE-COLUMN LAYOUT
+     ================================================================ -->
+<div class="main-container">
+
+    <!-- ==============================================================
+         LEFT PANEL — CONTROLS
+         ============================================================== -->
+    <div class="panel left-panel" id="left-panel">
+
+        <div class="section-title">📍 Route Selection</div>
+        <label for="source-select">Source Intersection</label>
+        <select id="source-select"></select>
+        <label for="dest-select">Destination Intersection</label>
+        <select id="dest-select"></select>
+
+        <div class="section-title">⚙️ Simulation</div>
+
+        <label>Simulation Speed</label>
+        <div class="range-row">
+            <input type="range" id="sim-speed" min="1" max="10" value="5">
+            <span class="range-val" id="sim-speed-val">5</span>
+        </div>
+
+        <label>Time of Day (Hour)</label>
+        <div class="range-row">
+            <input type="range" id="time-hour" min="0" max="23.75" step="0.25" value="8">
+            <span class="range-val" id="time-hour-val">8:00</span>
+        </div>
+
+        <label>Auto-advance Time</label>
+        <div class="range-row">
+            <input type="range" id="time-advance" min="0" max="1" step="1" value="1">
+            <span class="range-val" id="time-advance-val">ON</span>
+        </div>
+
+        <div class="section-title">🐜 ACO Parameters</div>
+
+        <label>Number of Ants</label>
+        <div class="range-row">
+            <input type="range" id="num-ants" min="5" max="50" value="20">
+            <span class="range-val" id="num-ants-val">20</span>
+        </div>
+
+        <label>ACO Iterations</label>
+        <div class="range-row">
+            <input type="range" id="aco-iters" min="10" max="200" value="50">
+            <span class="range-val" id="aco-iters-val">50</span>
+        </div>
+
+        <div class="section-title">🔧 PSO Settings</div>
+
+        <label>PSO Particles</label>
+        <div class="range-row">
+            <input type="range" id="pso-particles" min="10" max="50" value="20">
+            <span class="range-val" id="pso-particles-val">20</span>
+        </div>
+
+        <label>PSO Iterations</label>
+        <div class="range-row">
+            <input type="range" id="pso-iters" min="5" max="60" value="20">
+            <span class="range-val" id="pso-iters-val">20</span>
+        </div>
+
+        <div class="section-title">🚨 Rerouting Thresholds</div>
+
+        <label>ΔR_max (Change Trigger)</label>
+        <div class="range-row">
+            <input type="range" id="delta-r-max" min="50" max="3000" step="50" value="500">
+            <span class="range-val" id="delta-r-max-val">500</span>
+        </div>
+
+        <label>R_max (Absolute Trigger)</label>
+        <div class="range-row">
+            <input type="range" id="r-max" min="500" max="25000" step="500" value="5000">
+            <span class="range-val" id="r-max-val">5000</span>
+        </div>
+
+        <div class="section-title">▶️ Actions</div>
+        <button class="accent"   id="btn-pso"      >🔬 Run PSO Optimization</button>
+        <button class="primary"  id="btn-aco-imp"   >🐜 Run Improved ACO</button>
+        <button                  id="btn-aco-std"   >📏 Run Standard ACO</button>
+        <button class="primary"  id="btn-start-sim" >▶️  Start Dynamic Simulation</button>
+        <button class="danger"   id="btn-stop-sim"  >⏹  Stop</button>
+        <button                  id="btn-reset"     >🔄 Reset All</button>
+
+        <div class="section-title">🧪 Advanced</div>
+        <button class="accent"   id="btn-compare"   >📊 Full Comparison</button>
+        <button                  id="btn-batch"     >🧪 24-Hour Batch Test</button>
+        <button class="warning"  id="btn-incident"  >🚨 Simulate Incident</button>
+
+        <div class="section-title">⌨️ Shortcuts</div>
+        <div class="shortcuts-help">
+            <kbd>P</kbd> PSO &nbsp;
+            <kbd>A</kbd> Improved ACO<br>
+            <kbd>S</kbd> Standard ACO &nbsp;
+            <kbd>Space</kbd> Start/Stop<br>
+            <kbd>R</kbd> Reset &nbsp;
+            <kbd>C</kbd> Compare<br>
+            <kbd>I</kbd> Incident &nbsp;
+            <kbd>+</kbd><kbd>−</kbd> Speed<br>
+            <kbd>Click</kbd> Set Source &nbsp;
+            <kbd>Shift+Click</kbd> Dest
+        </div>
+    </div>
+
+    <!-- ==============================================================
+         CENTER — CANVAS + LOG
+         ============================================================== -->
+    <div class="canvas-container">
+        <div id="canvas-holder"></div>
+        <div class="log-area" id="log-area"></div>
+    </div>
+
+    <!-- ==============================================================
+         RIGHT PANEL — METRICS & INFO
+         ============================================================== -->
+    <div class="panel right-panel">
+
+        <div class="section-title">🕐 Simulation Time</div>
+        <div class="time-display">
+            <div class="tlabel">Current Time</div>
+            <div class="time" id="display-time">08:00</div>
+            <div class="tlabel" id="display-traffic-state">Morning Rush Building</div>
+        </div>
+
+        <div class="section-title">📊 PSO-Optimized Parameters</div>
+        <div class="params-grid">
+            <div class="param-box">
+                <div class="plabel">α</div>
+                <div class="pvalue" id="display-alpha">1.00</div>
+            </div>
+            <div class="param-box">
+                <div class="plabel">β</div>
+                <div class="pvalue" id="display-beta">2.00</div>
+            </div>
+            <div class="param-box">
+                <div class="plabel">ρ</div>
+                <div class="pvalue" id="display-rho">0.50</div>
+            </div>
+        </div>
+
+        <div class="section-title">🛤️ Current Best Path</div>
+        <div class="path-display" id="display-best-path">No path computed yet.</div>
+
+        <div class="metric-card">
+            <div class="metric-label">Path Cost (Road Factor R)</div>
+            <div class="metric-value" id="display-path-cost">—</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Path Distance (meters)</div>
+            <div class="metric-value" id="display-path-dist">—</div>
+        </div>
+
+        <div class="section-title">📈 Congestion Metrics</div>
+        <div class="metric-card">
+            <div class="metric-label">Congestion Rate (CR) — Improved</div>
+            <div class="metric-value" id="display-cr-imp">—</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Congestion Rate (CR) — Standard</div>
+            <div class="metric-value" id="display-cr-std">—</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">CR Promotion Rate</div>
+            <div class="metric-value good" id="display-cr-promote">—</div>
+        </div>
+
+        <div class="section-title">🔢 Rerouting Events</div>
+        <div class="metric-card">
+            <div class="metric-label">Total Reroutes</div>
+            <div class="metric-value" id="display-reroutes">0</div>
+        </div>
+
+        <div class="section-title">📋 Comparison Table</div>
+        <table class="comparison-table">
+            <thead>
+                <tr><th></th><th>Standard</th><th>Improved</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cost</td>
+                    <td id="cmp-std-cost">—</td>
+                    <td id="cmp-imp-cost">—</td>
+                </tr>
+                <tr>
+                    <td>Distance</td>
+                    <td id="cmp-std-dist">—</td>
+                    <td id="cmp-imp-dist">—</td>
+                </tr>
+                <tr>
+                    <td>CR</td>
+                    <td id="cmp-std-cr">—</td>
+                    <td id="cmp-imp-cr">—</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">🎨 Legend</div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot" style="background:#3fb950;"></div> Free Flow
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background:#d29922;"></div> Moderate
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background:#f85149;"></div> Congested
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background:#8b0000;"></div> Gridlock
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background:#58a6ff;"></div> Improved Path
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background:#bc8cff;"></div> Standard Path
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background:#f0883e;"></div> Vehicle
+            </div>
+        </div>
+    </div>
+
+</div><!-- /.main-container -->
+
+<!-- ================================================================
+     JAVASCRIPT — COMPLETE APPLICATION
+     ================================================================ -->
+<script>
+// ================================================================
+//  DHAKA DYNAMIC PATH PLANNER
+//  PSO-ACO Hybrid Simulation with Road Condition Factor
+//
+//  Based on: "Dynamic Path Planning Based on Improved Ant Colony
+//  Algorithm in Traffic Congestion" — Wu et al.
+//
+//  Target: Dhaka City road network (10 major intersections)
+// ================================================================
+
+// ────────────────────────────────────────────────────────
+// SECTION 1 ▸ CONFIGURATION CONSTANTS
+// ────────────────────────────────────────────────────────
+const CONFIG = {
+    // Vehicle
+    VEHICLE_LENGTH: 4.5,           // L — avg vehicle length (m), mix of rickshaws + cars
+
+    // ACO defaults
+    TAU_INITIAL: 1.0,              // initial pheromone
+    Q: 100,                        // pheromone deposit constant
+    DEFAULT_ALPHA: 1.0,            // pheromone importance
+    DEFAULT_BETA: 2.0,             // heuristic importance
+    DEFAULT_RHO: 0.5,              // evaporation rate
+    TAU_MIN: 0.001,                // minimum pheromone (avoid stagnation)
+    ELITIST_FACTOR: 2.0,           // extra deposit on best path
+
+    // PSO search bounds
+    ALPHA_RANGE: [0.5, 5.0],
+    BETA_RANGE:  [0.5, 5.0],
+    RHO_RANGE:   [0.05, 0.95],
+    PSO_W:  0.72,                  // inertia weight
+    PSO_C1: 1.49,                  // cognitive coefficient
+    PSO_C2: 1.49,                  // social coefficient
+
+    // Rerouting
+    DELTA_R_MAX: 500,
+    R_MAX: 5000,
+
+    // Traffic simulation
+    BASE_FLOW_MIN: 30,
+    BASE_FLOW_MAX: 80,
+    MORNING_PEAK_HOUR: 8.5,
+    MORNING_PEAK_SIGMA: 1.0,
+    MORNING_PEAK_AMP: 250,
+    EVENING_PEAK_HOUR: 18.0,
+    EVENING_PEAK_SIGMA: 1.5,
+    EVENING_PEAK_AMP: 300,
+    CONGESTION_THRESHOLD: 0.3,     // C_i above this = "congested"
+
+    // Quick-ACO used inside PSO fitness evaluation
+    PSO_INNER_ANTS: 10,
+    PSO_INNER_ITERS: 15,
+};
+
+// ────────────────────────────────────────────────────────
+// SECTION 2 ▸ MATH UTILITIES
+// ────────────────────────────────────────────────────────
+function gaussian(x, mean, sigma) {
+    return Math.exp(-0.5 * ((x - mean) / sigma) ** 2);
+}
+
+function clamp(v, lo, hi) {
+    return Math.max(lo, Math.min(hi, v));
+}
+
+function randRange(lo, hi) {
+    return lo + Math.random() * (hi - lo);
+}
+
+function rouletteSelect(probs) {
+    const sum = probs.reduce((a, b) => a + b, 0);
+    if (sum <= 0) return Math.floor(Math.random() * probs.length);
+    let r = Math.random() * sum;
+    for (let i = 0; i < probs.length; i++) {
+        r -= probs[i];
+        if (r <= 0) return i;
+    }
+    return probs.length - 1;
+}
+
+function formatHour(h) {
+    const hr  = Math.floor(h);
+    const min = Math.round((h - hr) * 60);
+    return `${String(hr).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 3 ▸ DHAKA ROAD GRAPH (10 intersections, 16 edges)
+// ────────────────────────────────────────────────────────
+
+/** Node positions are in "canvas coordinates" for visualization */
+const NODES = [
+    { id: 0,  name: "Uttara",        x: 450, y: 55  },
+    { id: 1,  name: "Mirpur-10",     x: 120, y: 155 },
+    { id: 2,  name: "Banani",        x: 560, y: 165 },
+    { id: 3,  name: "Gulshan-2",     x: 690, y: 245 },
+    { id: 4,  name: "Gulshan-1",     x: 660, y: 360 },
+    { id: 5,  name: "Mohakhali",     x: 475, y: 265 },
+    { id: 6,  name: "Tejgaon",       x: 380, y: 375 },
+    { id: 7,  name: "Karwan Bazar",  x: 250, y: 340 },
+    { id: 8,  name: "Farmgate",      x: 195, y: 465 },
+    { id: 9,  name: "Shahbagh",      x: 400, y: 540 },
+];
+
+/**
+ * Edge definitions: [nodeA, nodeB, distance_m, lanes, baseFlowFactor]
+ *
+ * Lane-Congestion relationship analysis for Dhaka:
+ *   maxCapacity = lanes × distance / vehicleLength   (bumper-to-bumper)
+ *   C_i = vehicleCount × L / (lanes × distance)
+ *   ⇒  More lanes → lower C for same #vehicles
+ *   ⇒  Dhaka's narrow 2-3 lane roads saturate rapidly
+ */
+const EDGE_DEFS = [
+    [0, 1,  9000, 3, 1.2],   // Uttara ↔ Mirpur-10 (Airport Rd)
+    [0, 2,  7000, 4, 1.0],   // Uttara ↔ Banani
+    [0, 5, 10000, 4, 1.3],   // Uttara ↔ Mohakhali (Airport Rd Express)
+    [1, 7,  5500, 3, 1.5],   // Mirpur-10 ↔ Karwan Bazar
+    [1, 8,  6500, 3, 1.4],   // Mirpur-10 ↔ Farmgate (Mirpur Rd)
+    [2, 3,  2500, 4, 0.8],   // Banani ↔ Gulshan-2 (Gulshan Ave)
+    [2, 5,  2000, 4, 1.1],   // Banani ↔ Mohakhali
+    [3, 4,  2000, 4, 0.9],   // Gulshan-2 ↔ Gulshan-1
+    [4, 5,  3000, 3, 1.3],   // Gulshan-1 ↔ Mohakhali
+    [4, 6,  3500, 3, 1.0],   // Gulshan-1 ↔ Tejgaon
+    [5, 6,  2500, 3, 1.4],   // Mohakhali ↔ Tejgaon
+    [5, 7,  3000, 3, 1.2],   // Mohakhali ↔ Karwan Bazar
+    [6, 7,  1500, 3, 1.6],   // Tejgaon ↔ Karwan Bazar
+    [6, 9,  3500, 3, 1.1],   // Tejgaon ↔ Shahbagh
+    [7, 8,  1200, 4, 1.8],   // Karwan Bazar ↔ Farmgate (KNI Ave)
+    [8, 9,  2500, 4, 1.5],   // Farmgate ↔ Shahbagh (KNI Ave)
+];
+
+class DhakaGraph {
+    constructor() {
+        this.numNodes = NODES.length;
+        this.nodes    = NODES;
+        this.edges    = [];
+        this.adj      = {};  // adj[nodeId] = [{to, edgeIdx}, ...]
+
+        for (let i = 0; i < this.numNodes; i++) this.adj[i] = [];
+
+        EDGE_DEFS.forEach(([a, b, dist, lanes, bff], idx) => {
+            this.edges.push({
+                id: idx,
+                from: a,
+                to: b,
+                distance:       dist,     // d_i  (meters)
+                lanes:          lanes,    // l_i
+                baseFlowFactor: bff,
+                // ---- dynamic state ----
+                vehicleCount:    0,       // f_i(t-1)
+                flowIn:          0,       // f_in,i(t)
+                flowOut:         0,       // f_out,i(t)
+                congestionCoeff: 0,       // C_i(t)
+                roadFactor:      dist,    // R_i(t)   = d_i initially
+                prevRoadFactor:  dist,    // R_i(t-1) for ΔR
+                pheromone:       CONFIG.TAU_INITIAL,
+            });
+            this.adj[a].push({ to: b, edgeIdx: idx });
+            this.adj[b].push({ to: a, edgeIdx: idx });
+        });
+    }
+
+    edgeBetween(a, b) {
+        for (const n of this.adj[a]) if (n.to === b) return this.edges[n.edgeIdx];
+        return null;
+    }
+
+    edgeIndexBetween(a, b) {
+        for (const n of this.adj[a]) if (n.to === b) return n.edgeIdx;
+        return -1;
+    }
+
+    neighbors(node) {
+        return this.adj[node];
+    }
+
+    resetPheromones() {
+        this.edges.forEach(e => e.pheromone = CONFIG.TAU_INITIAL);
+    }
+
+    resetTraffic() {
+        this.edges.forEach(e => {
+            e.vehicleCount    = 0;
+            e.flowIn          = 0;
+            e.flowOut         = 0;
+            e.congestionCoeff = 0;
+            e.roadFactor      = e.distance;
+            e.prevRoadFactor  = e.distance;
+        });
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 4 ▸ TRAFFIC SIMULATOR (Gaussian peak-hour model)
+// ────────────────────────────────────────────────────────
+class TrafficSimulator {
+    constructor(graph) {
+        this.graph = graph;
+        this.hour  = 8.0;
+    }
+
+    /** Flow rate for edge at given hour (vehicles/time-step) */
+    flowRate(edge, hour) {
+        const morning = CONFIG.MORNING_PEAK_AMP * gaussian(hour, CONFIG.MORNING_PEAK_HOUR, CONFIG.MORNING_PEAK_SIGMA);
+        const evening = CONFIG.EVENING_PEAK_AMP * gaussian(hour, CONFIG.EVENING_PEAK_HOUR, CONFIG.EVENING_PEAK_SIGMA);
+        const base    = CONFIG.BASE_FLOW_MIN + edge.baseFlowFactor * (CONFIG.BASE_FLOW_MAX - CONFIG.BASE_FLOW_MIN);
+        return (base + morning + evening) * (0.7 + Math.random() * 0.6);
+    }
+
+    /**
+     * Update all edges for given hour.
+     *
+     * For each edge i:
+     *   C_i(t) = (vehicleCount × L) / (lanes × distance)
+     *   R_i(t) = d_i × (1 + C_i(t))
+     */
+    update(hour) {
+        this.hour = hour;
+        const L = CONFIG.VEHICLE_LENGTH;
+
+        for (const e of this.graph.edges) {
+            e.prevRoadFactor = e.roadFactor;
+
+            // Flows
+            e.flowIn = this.flowRate(e, hour);
+            const capacity = e.lanes * e.distance / L * 0.3;
+            e.flowOut = Math.min(e.vehicleCount + e.flowIn,
+                                 capacity * (0.6 + Math.random() * 0.4));
+
+            // Vehicle count update
+            e.vehicleCount = Math.max(0, e.vehicleCount + e.flowIn - e.flowOut);
+
+            // Congestion coefficient  C_i(t)
+            e.congestionCoeff = clamp((e.vehicleCount * L) / (e.lanes * e.distance), 0, 1.5);
+
+            // Road condition factor  R_i(t) = d_i × (1 + C_i)
+            e.roadFactor = e.distance * (1 + e.congestionCoeff);
+        }
+    }
+
+    trafficLabel(hour) {
+        if (hour >= 7   && hour <= 9.5)  return "🔴 Morning Rush Hour";
+        if (hour > 9.5  && hour < 16)    return "🟡 Midday Traffic";
+        if (hour >= 16  && hour <= 20)   return "🔴 Evening Rush Hour";
+        if (hour > 20   && hour <= 23)   return "🟢 Evening — Light";
+        return "🟢 Night — Low Traffic";
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 5 ▸ ROAD CONDITION CALCULATOR (static helpers)
+// ────────────────────────────────────────────────────────
+class RoadCalc {
+    static R(edge) {
+        const C = (edge.vehicleCount * CONFIG.VEHICLE_LENGTH) / (edge.lanes * edge.distance);
+        return edge.distance * (1 + clamp(C, 0, 2.0));
+    }
+
+    static deltaR(edge) {
+        return Math.abs(edge.roadFactor - edge.prevRoadFactor);
+    }
+
+    static capacity(edge) {
+        const max = edge.lanes * edge.distance / CONFIG.VEHICLE_LENGTH;
+        return {
+            maxVehicles:     max,
+            utilization:     edge.vehicleCount / max,
+            congestionCoeff: edge.congestionCoeff,
+        };
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 6 ▸ PSO OPTIMIZER  (tunes α, β, ρ for ACO)
+// ────────────────────────────────────────────────────────
+class PSOOptimizer {
+    constructor(graph, src, dst, nParticles, nIter) {
+        this.graph      = graph;
+        this.src        = src;
+        this.dst        = dst;
+        this.nParticles = nParticles || 20;
+        this.nIter      = nIter || 20;
+        this.particles  = [];
+        this.gBest      = null;
+        this.gBestFit   = Infinity;
+        this.history     = [];  // convergence
+    }
+
+    init() {
+        this.particles = [];
+        this.gBest     = null;
+        this.gBestFit  = Infinity;
+        this.history   = [];
+
+        for (let i = 0; i < this.nParticles; i++) {
+            const pos = [
+                randRange(...CONFIG.ALPHA_RANGE),
+                randRange(...CONFIG.BETA_RANGE),
+                randRange(...CONFIG.RHO_RANGE),
+            ];
+            this.particles.push({
+                pos:  [...pos],
+                vel:  [randRange(-1,1), randRange(-1,1), randRange(-0.2,0.2)],
+                pBest:    [...pos],
+                pBestFit: Infinity,
+            });
+        }
+    }
+
+    /** Fitness = best path cost found by a quick ACO with given params */
+    fitness(alpha, beta, rho) {
+        const aco = new ACOPathfinder(this.graph, this.src, this.dst, {
+            alpha, beta, rho,
+            numAnts: CONFIG.PSO_INNER_ANTS,
+            maxIter: CONFIG.PSO_INNER_ITERS,
+            useRoadFactor: true,
+        });
+        const res = aco.run();
+        return res.bestCost === Infinity ? 1e9 : res.bestCost;
+    }
+
+    /** Run all iterations */
+    run() {
+        this.init();
+
+        for (let t = 0; t < this.nIter; t++) {
+            // Evaluate
+            for (const p of this.particles) {
+                const f = this.fitness(p.pos[0], p.pos[1], p.pos[2]);
+                if (f < p.pBestFit) { p.pBestFit = f; p.pBest = [...p.pos]; }
+                if (f < this.gBestFit) { this.gBestFit = f; this.gBest = [...p.pos]; }
+            }
+
+            // Update velocities & positions
+            for (const p of this.particles) {
+                for (let d = 0; d < 3; d++) {
+                    const r1 = Math.random(), r2 = Math.random();
+                    p.vel[d] = CONFIG.PSO_W * p.vel[d]
+                             + CONFIG.PSO_C1 * r1 * (p.pBest[d] - p.pos[d])
+                             + CONFIG.PSO_C2 * r2 * (this.gBest[d] - p.pos[d]);
+                    p.pos[d] += p.vel[d];
+                }
+                // Clamp
+                p.pos[0] = clamp(p.pos[0], ...CONFIG.ALPHA_RANGE);
+                p.pos[1] = clamp(p.pos[1], ...CONFIG.BETA_RANGE);
+                p.pos[2] = clamp(p.pos[2], ...CONFIG.RHO_RANGE);
+            }
+
+            this.history.push(this.gBestFit);
+        }
+
+        return {
+            alpha: this.gBest[0],
+            beta:  this.gBest[1],
+            rho:   this.gBest[2],
+            fitness: this.gBestFit,
+            convergence: this.history,
+        };
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 7 ▸ ACO PATHFINDER
+// ────────────────────────────────────────────────────────
+class ACOPathfinder {
+    constructor(graph, src, dst, opts = {}) {
+        this.graph = graph;
+        this.src   = src;
+        this.dst   = dst;
+
+        this.alpha  = opts.alpha  ?? CONFIG.DEFAULT_ALPHA;
+        this.beta   = opts.beta   ?? CONFIG.DEFAULT_BETA;
+        this.rho    = opts.rho    ?? CONFIG.DEFAULT_RHO;
+        this.nAnts  = opts.numAnts ?? 20;
+        this.maxIter = opts.maxIter ?? 50;
+        this.useR   = opts.useRoadFactor !== undefined ? opts.useRoadFactor : true;
+
+        // Local pheromone copy
+        this.tau = {};
+        graph.edges.forEach((_, i) => this.tau[i] = CONFIG.TAU_INITIAL);
+
+        this.bestPath = null;
+        this.bestCost = Infinity;
+        this.iterHist = [];
+    }
+
+    edgeCost(edge) { return this.useR ? edge.roadFactor : edge.distance; }
+    heuristic(edge) { const c = this.edgeCost(edge); return c > 0 ? 1/c : 1e6; }
+
+    /** One ant builds a path src → dst */
+    buildPath() {
+        let cur = this.src;
+        const visited = new Set([cur]);
+        const path = [cur];
+        let cost = 0;
+
+        while (cur !== this.dst) {
+            const nbrs = this.graph.adj[cur].filter(n => !visited.has(n.to));
+            if (nbrs.length === 0) return { path: null, cost: Infinity };
+
+            const probs = nbrs.map(n => {
+                const e = this.graph.edges[n.edgeIdx];
+                return Math.pow(this.tau[n.edgeIdx], this.alpha)
+                     * Math.pow(this.heuristic(e),   this.beta);
+            });
+
+            const idx  = rouletteSelect(probs);
+            const next = nbrs[idx];
+            cost += this.edgeCost(this.graph.edges[next.edgeIdx]);
+            cur = next.to;
+            visited.add(cur);
+            path.push(cur);
+        }
+        return { path, cost };
+    }
+
+    /** Run all iterations */
+    run() {
+        for (let t = 0; t < this.maxIter; t++) {
+            const ants = [];
+            for (let k = 0; k < this.nAnts; k++) {
+                const res = this.buildPath();
+                ants.push(res);
+                if (res.path && res.cost < this.bestCost) {
+                    this.bestCost = res.cost;
+                    this.bestPath = [...res.path];
+                }
+            }
+
+            // Evaporate
+            for (const i in this.tau) {
+                this.tau[i] = Math.max(this.tau[i] * (1 - this.rho), CONFIG.TAU_MIN);
+            }
+
+            // Deposit
+            for (const ant of ants) {
+                if (!ant.path || ant.cost === Infinity) continue;
+                const dep = CONFIG.Q / ant.cost;
+                for (let i = 0; i < ant.path.length - 1; i++) {
+                    const ei = this.graph.edgeIndexBetween(ant.path[i], ant.path[i+1]);
+                    if (ei >= 0) this.tau[ei] += dep;
+                }
+            }
+
+            // Elitist deposit on global best
+            if (this.bestPath) {
+                const eDep = CONFIG.Q / this.bestCost * CONFIG.ELITIST_FACTOR;
+                for (let i = 0; i < this.bestPath.length - 1; i++) {
+                    const ei = this.graph.edgeIndexBetween(this.bestPath[i], this.bestPath[i+1]);
+                    if (ei >= 0) this.tau[ei] += eDep;
+                }
+            }
+
+            this.iterHist.push(this.bestCost);
+        }
+
+        // Copy pheromones back for visualization
+        for (const i in this.tau) this.graph.edges[i].pheromone = this.tau[i];
+
+        return {
+            bestPath: this.bestPath,
+            bestCost: this.bestCost,
+            history:  this.iterHist,
+        };
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 8 ▸ DYNAMIC PLANNER (vehicle movement + rerouting)
+// ────────────────────────────────────────────────────────
+class DynamicPlanner {
+    constructor(graph, trafficSim) {
+        this.graph      = graph;
+        this.traffic    = trafficSim;
+        this.path       = null;
+        this.pathIdx    = 0;
+        this.progress   = 0;       // 0→1 on current edge
+        this.src        = 0;
+        this.dst        = 9;
+        this.reroutes   = 0;
+        this.active     = false;
+        this.arrived    = false;
+        this.deltaRMax  = CONFIG.DELTA_R_MAX;
+        this.rMax       = CONFIG.R_MAX;
+        this.params     = { alpha: CONFIG.DEFAULT_ALPHA, beta: CONFIG.DEFAULT_BETA, rho: CONFIG.DEFAULT_RHO };
+    }
+
+    setPath(p)   { this.path = p; this.pathIdx = 0; this.progress = 0; this.arrived = false; }
+    setParams(a,b,r) { this.params = { alpha:a, beta:b, rho:r }; }
+    currentNode() { return this.path ? this.path[this.pathIdx] : this.src; }
+
+    /** Check road conditions ahead — trigger if ΔR > threshold or R > threshold */
+    needsReroute() {
+        if (!this.path || this.arrived) return false;
+        for (let i = this.pathIdx; i < this.path.length - 1; i++) {
+            const e = this.graph.edgeBetween(this.path[i], this.path[i+1]);
+            if (!e) continue;
+            if (RoadCalc.deltaR(e) > this.deltaRMax) return true;
+            if (e.roadFactor > this.rMax) return true;
+        }
+        return false;
+    }
+
+    /** Compute new path from current node */
+    reroute() {
+        const cur = this.currentNode();
+        if (cur === this.dst) { this.arrived = true; return null; }
+
+        const aco = new ACOPathfinder(this.graph, cur, this.dst, {
+            alpha: this.params.alpha,
+            beta:  this.params.beta,
+            rho:   this.params.rho,
+            numAnts: 15,
+            maxIter: 30,
+            useRoadFactor: true,
+        });
+        const res = aco.run();
+        if (res.bestPath) {
+            this.path     = res.bestPath;
+            this.pathIdx  = 0;
+            this.progress = 0;
+            this.reroutes++;
+        }
+        return res;
+    }
+
+    /** Move vehicle forward */
+    advance(speed) {
+        if (!this.path || this.arrived) return;
+        if (this.pathIdx >= this.path.length - 1) { this.arrived = true; return; }
+
+        const e = this.graph.edgeBetween(this.path[this.pathIdx], this.path[this.pathIdx + 1]);
+        if (!e) { this.pathIdx++; this.progress = 0; return; }
+
+        const speedFactor = 1 / (1 + e.congestionCoeff);
+        this.progress += speed * speedFactor * 0.02;
+
+        if (this.progress >= 1) {
+            this.pathIdx++;
+            this.progress = 0;
+        }
+    }
+
+    /** Get interpolated position */
+    vehiclePos() {
+        if (!this.path || this.path.length < 2) return null;
+        if (this.arrived) { const d = NODES[this.dst]; return {x:d.x, y:d.y}; }
+
+        const idx = Math.min(this.pathIdx, this.path.length - 2);
+        const a = NODES[this.path[idx]];
+        const b = NODES[this.path[idx + 1]];
+        const t = this.progress;
+        return { x: a.x + (b.x - a.x)*t, y: a.y + (b.y - a.y)*t };
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 9 ▸ METRICS CALCULATOR
+// ────────────────────────────────────────────────────────
+class Metrics {
+    /** CR = Σ(R of congested edges) / Σ(R of all edges on path) */
+    static CR(graph, path) {
+        if (!path || path.length < 2) return 0;
+        let totalR = 0, congR = 0;
+        for (let i = 0; i < path.length - 1; i++) {
+            const e = graph.edgeBetween(path[i], path[i+1]);
+            if (!e) continue;
+            totalR += e.roadFactor;
+            if (e.congestionCoeff > CONFIG.CONGESTION_THRESHOLD) congR += e.roadFactor;
+        }
+        return totalR > 0 ? congR / totalR : 0;
+    }
+
+    /** CR_promote = (CR_std - CR_imp) / CR_std × 100% */
+    static CRPromote(crStd, crImp) {
+        return crStd > 0 ? ((crStd - crImp) / crStd) * 100 : 0;
+    }
+
+    static pathCost(graph, path) {
+        if (!path || path.length < 2) return Infinity;
+        let c = 0;
+        for (let i = 0; i < path.length - 1; i++) {
+            const e = graph.edgeBetween(path[i], path[i+1]);
+            if (e) c += e.roadFactor;
+        }
+        return c;
+    }
+
+    static pathDist(graph, path) {
+        if (!path || path.length < 2) return Infinity;
+        let d = 0;
+        for (let i = 0; i < path.length - 1; i++) {
+            const e = graph.edgeBetween(path[i], path[i+1]);
+            if (e) d += e.distance;
+        }
+        return d;
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 10 ▸ GLOBAL STATE
+// ────────────────────────────────────────────────────────
+let graph, trafficSim, planner;
+let psoResult     = null;
+let improvedPath  = null;
+let standardPath  = null;
+let simRunning    = false;
+let simHour       = 8.0;
+let frameCnt      = 0;
+let rerouteFlash  = 0;
+let antParticles  = [];   // decorative animated ants on path
+let logMessages   = [];
+
+// ────────────────────────────────────────────────────────
+// SECTION 11 ▸ LOGGING
+// ────────────────────────────────────────────────────────
+function addLog(msg, cls) {
+    const t = new Date().toLocaleTimeString();
+    logMessages.push({ text: `[${t}] ${msg}`, cls: cls || '' });
+    if (logMessages.length > 200) logMessages.shift();
+    const el = document.getElementById('log-area');
+    el.innerHTML = logMessages.map(m =>
+        `<div class="log-line ${m.cls}">${m.text}</div>`
+    ).join('');
+    el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(cls, label) {
+    const b = document.getElementById('status-badge');
+    b.className = `status-badge status-${cls}`;
+    b.textContent = label;
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 12 ▸ UI INITIALIZATION & HELPERS
+// ────────────────────────────────────────────────────────
+function initUI() {
+    const srcSel = document.getElementById('source-select');
+    const dstSel = document.getElementById('dest-select');
+    NODES.forEach(n => {
+        srcSel.innerHTML += `<option value="${n.id}">${n.name}</option>`;
+        dstSel.innerHTML += `<option value="${n.id}">${n.name}</option>`;
+    });
+    dstSel.value = "9";
+
+    // Slider bindings
+    const sliders = [
+        ['sim-speed',     'sim-speed-val',     v => v],
+        ['time-hour',     'time-hour-val',     v => formatHour(parseFloat(v))],
+        ['time-advance',  'time-advance-val',  v => v == 1 ? 'ON' : 'OFF'],
+        ['num-ants',      'num-ants-val',      v => v],
+        ['aco-iters',     'aco-iters-val',     v => v],
+        ['pso-particles', 'pso-particles-val', v => v],
+        ['pso-iters',     'pso-iters-val',     v => v],
+        ['delta-r-max',   'delta-r-max-val',   v => v],
+        ['r-max',         'r-max-val',         v => v],
+    ];
+    sliders.forEach(([id, vid, fmt]) => {
+        const s = document.getElementById(id);
+        const v = document.getElementById(vid);
+        s.addEventListener('input', () => v.textContent = fmt(s.value));
+    });
+
+    // Button bindings
+    document.getElementById('btn-pso').addEventListener('click', actionPSO);
+    document.getElementById('btn-aco-imp').addEventListener('click', actionACOImproved);
+    document.getElementById('btn-aco-std').addEventListener('click', actionACOStandard);
+    document.getElementById('btn-start-sim').addEventListener('click', actionStart);
+    document.getElementById('btn-stop-sim').addEventListener('click', actionStop);
+    document.getElementById('btn-reset').addEventListener('click', actionReset);
+    document.getElementById('btn-compare').addEventListener('click', actionCompare);
+    document.getElementById('btn-batch').addEventListener('click', actionBatch);
+    document.getElementById('btn-incident').addEventListener('click', actionIncident);
+}
+
+// Getters
+function getSource()    { return parseInt(document.getElementById('source-select').value); }
+function getDest()      { return parseInt(document.getElementById('dest-select').value); }
+function getSimSpeed()  { return parseInt(document.getElementById('sim-speed').value); }
+function getTimeHour()  { return parseFloat(document.getElementById('time-hour').value); }
+function getAutoTime()  { return parseInt(document.getElementById('time-advance').value) === 1; }
+function getNumAnts()   { return parseInt(document.getElementById('num-ants').value); }
+function getAcoIters()  { return parseInt(document.getElementById('aco-iters').value); }
+function getPsoN()      { return parseInt(document.getElementById('pso-particles').value); }
+function getPsoIters()  { return parseInt(document.getElementById('pso-iters').value); }
+function getDRMax()     { return parseFloat(document.getElementById('delta-r-max').value); }
+function getRMax()      { return parseFloat(document.getElementById('r-max').value); }
+
+// ────────────────────────────────────────────────────────
+// SECTION 13 ▸ METRICS DISPLAY UPDATE
+// ────────────────────────────────────────────────────────
+function refreshDisplay() {
+    // Time
+    document.getElementById('display-time').textContent = formatHour(simHour);
+    document.getElementById('display-traffic-state').textContent = trafficSim.trafficLabel(simHour);
+
+    // PSO params
+    if (psoResult) {
+        document.getElementById('display-alpha').textContent = psoResult.alpha.toFixed(2);
+        document.getElementById('display-beta').textContent  = psoResult.beta.toFixed(2);
+        document.getElementById('display-rho').textContent   = psoResult.rho.toFixed(2);
+    }
+
+    // Improved path
+    if (improvedPath) {
+        document.getElementById('display-best-path').textContent =
+            improvedPath.map(i => NODES[i].name).join(' → ');
+        document.getElementById('display-path-cost').textContent =
+            Metrics.pathCost(graph, improvedPath).toFixed(0);
+        document.getElementById('display-path-dist').textContent =
+            Metrics.pathDist(graph, improvedPath).toFixed(0) + ' m';
+
+        const crI = Metrics.CR(graph, improvedPath);
+        const elI = document.getElementById('display-cr-imp');
+        elI.textContent = (crI*100).toFixed(1) + '%';
+        elI.className = 'metric-value ' + (crI < 0.3 ? 'good' : crI < 0.6 ? 'warn' : 'bad');
+
+        document.getElementById('cmp-imp-cost').textContent = Metrics.pathCost(graph, improvedPath).toFixed(0);
+        document.getElementById('cmp-imp-dist').textContent = Metrics.pathDist(graph, improvedPath).toFixed(0);
+        document.getElementById('cmp-imp-cr').textContent   = (crI*100).toFixed(1) + '%';
+    }
+
+    // Standard path
+    if (standardPath) {
+        const crS = Metrics.CR(graph, standardPath);
+        const elS = document.getElementById('display-cr-std');
+        elS.textContent = (crS*100).toFixed(1) + '%';
+        elS.className = 'metric-value ' + (crS < 0.3 ? 'good' : crS < 0.6 ? 'warn' : 'bad');
+
+        document.getElementById('cmp-std-cost').textContent = Metrics.pathCost(graph, standardPath).toFixed(0);
+        document.getElementById('cmp-std-dist').textContent = Metrics.pathDist(graph, standardPath).toFixed(0);
+        document.getElementById('cmp-std-cr').textContent   = (crS*100).toFixed(1) + '%';
+
+        if (improvedPath) {
+            const crI = Metrics.CR(graph, improvedPath);
+            const prom = Metrics.CRPromote(crS, crI);
+            const elP = document.getElementById('display-cr-promote');
+            elP.textContent = prom.toFixed(1) + '%';
+            elP.className = 'metric-value ' + (prom > 0 ? 'good' : 'bad');
+        }
+    }
+
+    document.getElementById('display-reroutes').textContent = planner.reroutes;
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 14 ▸ ACTION HANDLERS
+// ────────────────────────────────────────────────────────
+function actionPSO() {
+    const s = getSource(), d = getDest();
+    if (s === d) { addLog('⚠ Source = Destination!', 'warn'); return; }
+
+    setStatus('running', 'PSO RUNNING');
+    addLog(`🔬 PSO: ${NODES[s].name} → ${NODES[d].name} | particles=${getPsoN()} iters=${getPsoIters()}`, 'info');
+
+    trafficSim.update(simHour);
+
+    // Use setTimeout to let UI repaint
+    setTimeout(() => {
+        const pso = new PSOOptimizer(graph, s, d, getPsoN(), getPsoIters());
+        psoResult = pso.run();
+
+        planner.setParams(psoResult.alpha, psoResult.beta, psoResult.rho);
+
+        addLog(`✅ PSO done → α=${psoResult.alpha.toFixed(3)} β=${psoResult.beta.toFixed(3)} ρ=${psoResult.rho.toFixed(3)}`, 'success');
+        addLog(`   Fitness (best cost): ${psoResult.fitness.toFixed(1)}`);
+        setStatus('complete', 'PSO DONE');
+        refreshDisplay();
+    }, 50);
+}
+
+function actionACOImproved() {
+    const s = getSource(), d = getDest();
+    if (s === d) { addLog('⚠ Source = Destination!', 'warn'); return; }
+
+    setStatus('running', 'ACO RUNNING');
+    addLog(`🐜 Improved ACO: ${NODES[s].name} → ${NODES[d].name}`, 'info');
+
+    trafficSim.update(simHour);
+
+    setTimeout(() => {
+        const p = psoResult || { alpha: CONFIG.DEFAULT_ALPHA, beta: CONFIG.DEFAULT_BETA, rho: CONFIG.DEFAULT_RHO };
+        const aco = new ACOPathfinder(graph, s, d, {
+            alpha: p.alpha, beta: p.beta, rho: p.rho,
+            numAnts: getNumAnts(), maxIter: getAcoIters(),
+            useRoadFactor: true,
+        });
+        const res = aco.run();
+
+        if (res.bestPath) {
+            improvedPath = res.bestPath;
+            planner.src = s; planner.dst = d;
+            planner.setPath(res.bestPath);
+            const names = res.bestPath.map(i => NODES[i].name).join(' → ');
+            addLog(`✅ Path: ${names}`, 'success');
+            addLog(`   Cost=${res.bestCost.toFixed(1)}  Dist=${Metrics.pathDist(graph,res.bestPath).toFixed(0)}m`);
+        } else {
+            addLog('❌ No path found!', 'error');
+        }
+        setStatus('complete', 'ACO DONE');
+        refreshDisplay();
+    }, 50);
+}
+
+function actionACOStandard() {
+    const s = getSource(), d = getDest();
+    if (s === d) { addLog('⚠ Source = Destination!', 'warn'); return; }
+
+    addLog(`📏 Standard ACO (distance): ${NODES[s].name} → ${NODES[d].name}`, 'info');
+    trafficSim.update(simHour);
+
+    setTimeout(() => {
+        graph.resetPheromones();
+        const aco = new ACOPathfinder(graph, s, d, {
+            alpha: CONFIG.DEFAULT_ALPHA, beta: CONFIG.DEFAULT_BETA, rho: CONFIG.DEFAULT_RHO,
+            numAnts: getNumAnts(), maxIter: getAcoIters(),
+            useRoadFactor: false,
+        });
+        const res = aco.run();
+
+        if (res.bestPath) {
+            standardPath = res.bestPath;
+            const names = res.bestPath.map(i => NODES[i].name).join(' → ');
+            addLog(`✅ Std path: ${names}`, 'success');
+            addLog(`   Distance=${res.bestCost.toFixed(0)}m`);
+        } else {
+            addLog('❌ No path found!', 'error');
+        }
+        refreshDisplay();
+    }, 50);
+}
+
+function actionStart() {
+    if (!improvedPath) { addLog('⚠ Compute a path first (run ACO)!', 'warn'); return; }
+    simRunning = true;
+    planner.active = true;
+    planner.deltaRMax = getDRMax();
+    planner.rMax = getRMax();
+    setStatus('running', 'SIMULATING');
+    addLog('▶ Dynamic simulation started', 'info');
+}
+
+function actionStop() {
+    simRunning = false;
+    planner.active = false;
+    setStatus('idle', 'STOPPED');
+    addLog('⏹ Simulation stopped');
+}
+
+function actionReset() {
+    simRunning = false;
+    improvedPath = null;
+    standardPath = null;
+    psoResult = null;
+    antParticles = [];
+    graph.resetPheromones();
+    graph.resetTraffic();
+    planner = new DynamicPlanner(graph, trafficSim);
+    simHour = 8.0;
+    document.getElementById('time-hour').value = 8;
+    document.getElementById('time-hour-val').textContent = '8:00';
+    setStatus('idle', 'IDLE');
+    addLog('🔄 System reset');
+
+    // Clear displays
+    ['display-path-cost','display-path-dist','display-cr-imp','display-cr-std',
+     'display-cr-promote','cmp-std-cost','cmp-imp-cost','cmp-std-dist','cmp-imp-dist',
+     'cmp-std-cr','cmp-imp-cr'].forEach(id => document.getElementById(id).textContent = '—');
+    document.getElementById('display-best-path').textContent = 'No path computed yet.';
+    document.getElementById('display-reroutes').textContent = '0';
+    document.getElementById('display-alpha').textContent = '1.00';
+    document.getElementById('display-beta').textContent  = '2.00';
+    document.getElementById('display-rho').textContent   = '0.50';
+}
+
+function actionCompare() {
+    const s = getSource(), d = getDest();
+    if (s === d) { addLog('⚠ Source = Destination!', 'warn'); return; }
+
+    setStatus('running', 'COMPARING');
+    addLog('═══════════════════════════════════════', 'info');
+    addLog('📊 FULL COMPARISON START', 'info');
+
+    trafficSim.update(simHour);
+
+    setTimeout(() => {
+        // PSO
+        addLog('  Step 1/3: PSO optimizing…');
+        const pso = new PSOOptimizer(graph, s, d, getPsoN(), getPsoIters());
+        psoResult = pso.run();
+        planner.setParams(psoResult.alpha, psoResult.beta, psoResult.rho);
+        addLog(`  → α=${psoResult.alpha.toFixed(3)} β=${psoResult.beta.toFixed(3)} ρ=${psoResult.rho.toFixed(3)}`);
+
+        // Improved ACO
+        addLog('  Step 2/3: Improved ACO (road factor)…');
+        const acoI = new ACOPathfinder(graph, s, d, {
+            alpha: psoResult.alpha, beta: psoResult.beta, rho: psoResult.rho,
+            numAnts: getNumAnts(), maxIter: getAcoIters(), useRoadFactor: true,
+        });
+        const rI = acoI.run();
+        if (rI.bestPath) {
+            improvedPath = rI.bestPath;
+            planner.src = s; planner.dst = d; planner.setPath(rI.bestPath);
+            addLog(`  → ${rI.bestPath.map(i=>NODES[i].name).join(' → ')}`, 'success');
+        }
+
+        // Standard ACO
+        addLog('  Step 3/3: Standard ACO (distance)…');
+        graph.resetPheromones();
+        const acoS = new ACOPathfinder(graph, s, d, {
+            alpha: 1, beta: 2, rho: 0.5,
+            numAnts: getNumAnts(), maxIter: getAcoIters(), useRoadFactor: false,
+        });
+        const rS = acoS.run();
+        if (rS.bestPath) {
+            standardPath = rS.bestPath;
+            addLog(`  → ${rS.bestPath.map(i=>NODES[i].name).join(' → ')}`);
+        }
+
+        if (improvedPath && standardPath) {
+            const crI = Metrics.CR(graph, improvedPath);
+            const crS = Metrics.CR(graph, standardPath);
+            const pr  = Metrics.CRPromote(crS, crI);
+            addLog('');
+            addLog('  ┌─────────────────────────────┐', 'info');
+            addLog(`  │ Improved CR  : ${(crI*100).toFixed(1).padStart(6)}%      │`, 'info');
+            addLog(`  │ Standard CR  : ${(crS*100).toFixed(1).padStart(6)}%      │`, 'info');
+            addLog(`  │ CR Promotion : ${pr.toFixed(1).padStart(6)}%      │`, pr > 0 ? 'success' : 'error');
+            addLog('  └─────────────────────────────┘', 'info');
+        }
+        addLog('═══════════════════════════════════════', 'info');
+
+        setStatus('complete', 'COMPARED');
+        refreshDisplay();
+    }, 50);
+}
+
+function actionBatch() {
+    const s = getSource(), d = getDest();
+    if (s === d) { addLog('⚠ Source = Destination!', 'warn'); return; }
+
+    setStatus('running', 'BATCH TEST');
+    addLog('═══════════════════════════════════════', 'info');
+    addLog('🧪 24-HOUR BATCH EXPERIMENT', 'info');
+
+    setTimeout(() => {
+        const hours = [2, 6, 8, 9, 12, 15, 17, 18, 19, 21];
+        const results = [];
+
+        for (const h of hours) {
+            trafficSim.update(h);
+
+            const pso = new PSOOptimizer(graph, s, d, 15, 12);
+            const pr  = pso.run();
+
+            const aI = new ACOPathfinder(graph, s, d, {
+                alpha: pr.alpha, beta: pr.beta, rho: pr.rho,
+                numAnts: 15, maxIter: 25, useRoadFactor: true,
+            });
+            const rI = aI.run();
+
+            graph.resetPheromones();
+            const aS = new ACOPathfinder(graph, s, d, {
+                alpha:1, beta:2, rho:0.5, numAnts:15, maxIter:25, useRoadFactor:false,
+            });
+            const rS = aS.run();
+
+            const crI = rI.bestPath ? Metrics.CR(graph, rI.bestPath) : 1;
+            const crS = rS.bestPath ? Metrics.CR(graph, rS.bestPath) : 1;
+            const pm  = Metrics.CRPromote(crS, crI);
+            results.push({ h, crI, crS, pm });
+
+            addLog(`  ${String(h).padStart(2,'0')}:00 │ CR_imp ${(crI*100).toFixed(1).padStart(5)}% │ CR_std ${(crS*100).toFixed(1).padStart(5)}% │ Δ ${pm.toFixed(1).padStart(6)}%`);
+        }
+
+        const avg = results.reduce((s,r) => s + r.pm, 0) / results.length;
+        addLog('');
+        addLog(`  Average CR Promotion: ${avg.toFixed(1)}%`, avg > 0 ? 'success' : 'warn');
+        addLog('═══════════════════════════════════════', 'info');
+
+        trafficSim.update(simHour);
+        setStatus('complete', 'BATCH DONE');
+        refreshDisplay();
+    }, 50);
+}
+
+function actionIncident() {
+    const ei = Math.floor(Math.random() * graph.edges.length);
+    const e  = graph.edges[ei];
+
+    e.vehicleCount += 300;
+    e.congestionCoeff = clamp(
+        (e.vehicleCount * CONFIG.VEHICLE_LENGTH) / (e.lanes * e.distance), 0, 1.5
+    );
+    e.roadFactor = e.distance * (1 + e.congestionCoeff);
+
+    addLog(`🚨 INCIDENT on ${NODES[e.from].name} ↔ ${NODES[e.to].name}`, 'error');
+    addLog(`   C=${(e.congestionCoeff*100).toFixed(0)}%  R=${e.roadFactor.toFixed(0)}`, 'warn');
+    refreshDisplay();
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 15 ▸ P5.JS — SETUP
+// ────────────────────────────────────────────────────────
+function setup() {
+    graph      = new DhakaGraph();
+    trafficSim = new TrafficSimulator(graph);
+    planner    = new DynamicPlanner(graph, trafficSim);
+
+    trafficSim.update(8.0);
+
+    const holder = document.getElementById('canvas-holder');
+    const cnv = createCanvas(holder.offsetWidth, holder.offsetHeight);
+    cnv.parent('canvas-holder');
+    textFont('Segoe UI');
+
+    initUI();
+
+    addLog('🚦 Dhaka Dynamic Path Planner initialized', 'info');
+    addLog('   Select Source → Dest, then: PSO → ACO → Simulate');
+    addLog('   Or press C for full comparison');
+}
+
+function windowResized() {
+    const holder = document.getElementById('canvas-holder');
+    resizeCanvas(holder.offsetWidth, holder.offsetHeight);
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 16 ▸ RENDERING HELPERS
+// ────────────────────────────────────────────────────────
+function congestionColor(c) {
+    if (c < 0.15) return [63, 185, 80];       // green
+    if (c < 0.3)  return [130, 210, 55];       // yellow-green
+    if (c < 0.5)  return [210, 153, 34];       // orange
+    if (c < 0.75) return [248, 81, 73];        // red
+    return [139, 0, 0];                        // dark red
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 17 ▸ P5.JS — DRAW (main render loop)
+// ────────────────────────────────────────────────────────
+function draw() {
+    background(13, 17, 23);
+    frameCnt++;
+
+    const spd = getSimSpeed();
+
+    // ━━━ SIMULATION TICK ━━━
+    if (simRunning) {
+        // Advance clock
+        if (getAutoTime()) {
+            simHour += 0.005 * spd;
+            if (simHour >= 24) simHour -= 24;
+            document.getElementById('time-hour').value = simHour;
+            document.getElementById('time-hour-val').textContent = formatHour(simHour);
+        }
+
+        // Traffic update
+        if (frameCnt % Math.max(1, 6 - spd) === 0) {
+            trafficSim.update(simHour);
+        }
+
+        // Vehicle movement
+        if (planner.active && planner.path && !planner.arrived) {
+            planner.advance(spd);
+
+            // Reroute check
+            if (frameCnt % 30 === 0 && planner.needsReroute()) {
+                addLog(`🚨 Reroute at ${NODES[planner.currentNode()].name}`, 'warn');
+                const res = planner.reroute();
+                if (res && res.bestPath) {
+                    improvedPath = res.bestPath;
+                    rerouteFlash = 30;
+                    addLog(`   New: ${res.bestPath.map(i=>NODES[i].name).join(' → ')}`, 'info');
+                }
+                setStatus('rerouting', 'REROUTING');
+                setTimeout(() => { if (simRunning) setStatus('running', 'SIMULATING'); }, 1500);
+            }
+
+            if (planner.arrived) {
+                addLog('🎉 Vehicle arrived at destination!', 'success');
+                simRunning = false;
+                setStatus('arrived', 'ARRIVED');
+            }
+        }
+
+        if (frameCnt % 15 === 0) refreshDisplay();
+    } else {
+        simHour = getTimeHour();
+        if (frameCnt % 10 === 0) trafficSim.update(simHour);
+    }
+
+    // ━━━ CANVAS TRANSFORM ━━━
+    push();
+    const sx = width / 850;
+    const sy = height / 620;
+    const sc = Math.min(sx, sy, 1.4);
+    const ox = (width - 850 * sc) / 2;
+    const oy = (height - 620 * sc) / 2;
+    translate(ox, oy);
+    scale(sc);
+
+    // ━━━ DRAW EDGES ━━━
+    for (const e of graph.edges) {
+        const a = NODES[e.from];
+        const b = NODES[e.to];
+        const col = congestionColor(e.congestionCoeff);
+
+        // Pheromone glow
+        const phi = Math.min(e.pheromone / 5, 1);
+        if (phi > 0.1) {
+            strokeWeight(e.lanes * 2.5 + 4);
+            stroke(col[0], col[1], col[2], phi * 35);
+            line(a.x, a.y, b.x, b.y);
+        }
+
+        // Road line
+        strokeWeight(e.lanes * 1.8);
+        stroke(col[0], col[1], col[2], 200);
+        line(a.x, a.y, b.x, b.y);
+
+        // Congestion % label
+        if (sc > 0.65) {
+            const mx = (a.x + b.x) / 2;
+            const my = (a.y + b.y) / 2;
+            noStroke();
+            fill(200, 200, 200, 140);
+            textSize(8);
+            textAlign(CENTER, CENTER);
+            text((e.congestionCoeff * 100).toFixed(0) + '%', mx, my - 9);
+        }
+    }
+
+    // ━━━ STANDARD PATH (purple dashed, behind) ━━━
+    if (standardPath && standardPath.length > 1) {
+        for (let i = 0; i < standardPath.length - 1; i++) {
+            const a = NODES[standardPath[i]];
+            const b = NODES[standardPath[i + 1]];
+            const segs = 10;
+            for (let s = 0; s < segs; s += 2) {
+                const t1 = s / segs, t2 = (s + 1) / segs;
+                strokeWeight(3);
+                stroke(188, 140, 255, 110);
+                line(
+                    a.x + (b.x - a.x) * t1, a.y + (b.y - a.y) * t1,
+                    a.x + (b.x - a.x) * t2, a.y + (b.y - a.y) * t2
+                );
+            }
+        }
+    }
+
+    // ━━━ IMPROVED PATH (blue solid, on top) ━━━
+    if (improvedPath && improvedPath.length > 1) {
+        // Glow
+        strokeWeight(10);
+        stroke(88, 166, 255, 35 + sin(frameCount * 0.05) * 15);
+        noFill();
+        beginShape();
+        for (const id of improvedPath) vertex(NODES[id].x, NODES[id].y);
+        endShape();
+
+        // Main line
+        strokeWeight(4);
+        stroke(88, 166, 255, 220);
+        noFill();
+        beginShape();
+        for (const id of improvedPath) vertex(NODES[id].x, NODES[id].y);
+        endShape();
+
+        // Animated pulse dot
+        const pulseT = (frameCount * 0.02 * spd) % 1;
+        const nSeg = improvedPath.length - 1;
+        const sf = pulseT * nSeg;
+        const si = Math.floor(sf);
+        const st = sf - si;
+        if (si < nSeg) {
+            const pa = NODES[improvedPath[si]];
+            const pb = NODES[improvedPath[si + 1]];
+            const px = pa.x + (pb.x - pa.x) * st;
+            const py = pa.y + (pb.y - pa.y) * st;
+            noStroke();
+            for (let r = 12; r > 0; r -= 3) {
+                fill(88, 166, 255, (12 - r) * 7);
+                ellipse(px, py, r * 2);
+            }
+        }
+    }
+
+    // ━━━ REROUTE FLASH ━━━
+    if (rerouteFlash > 0) {
+        rerouteFlash--;
+        if (improvedPath) {
+            strokeWeight(8);
+            stroke(210, 153, 34, rerouteFlash * 8);
+            noFill();
+            beginShape();
+            for (const id of improvedPath) vertex(NODES[id].x, NODES[id].y);
+            endShape();
+        }
+    }
+
+    // ━━━ DRAW NODES ━━━
+    for (const node of NODES) {
+        const isSrc = node.id === getSource();
+        const isDst = node.id === getDest();
+        const onPath = improvedPath && improvedPath.includes(node.id);
+        const isCur  = planner.path && planner.path[planner.pathIdx] === node.id && simRunning;
+
+        // Glow for src/dst
+        if (isSrc || isDst) {
+            noStroke();
+            const gc = isSrc ? [63,185,80] : [248,81,73];
+            for (let r = 25; r > 0; r -= 5) {
+                fill(gc[0], gc[1], gc[2], (25 - r) * 3);
+                ellipse(node.x, node.y, r * 2);
+            }
+        }
+
+        // Node circle
+        strokeWeight(2);
+        if (isSrc)       { fill(63,185,80);  stroke(100,255,130); }
+        else if (isDst)  { fill(248,81,73);  stroke(255,130,120); }
+        else if (isCur)  { fill(240,136,62); stroke(255,180,100); }
+        else if (onPath) { fill(88,166,255); stroke(130,200,255); }
+        else             { fill(33,38,45);   stroke(48,54,61);    }
+        ellipse(node.x, node.y, 20);
+
+        // Node ID
+        noStroke();
+        fill(255, 255, 255, 200);
+        textAlign(CENTER, CENTER);
+        textSize(9);
+        text(node.id, node.x, node.y);
+
+        // Name
+        fill(201, 209, 217, 220);
+        textSize(10);
+        textAlign(CENTER, TOP);
+        text(node.name, node.x, node.y + 14);
+
+        // Mini congestion bar
+        if (sc > 0.75) {
+            let avgC = 0, cnt = 0;
+            for (const nb of graph.adj[node.id]) {
+                avgC += graph.edges[nb.edgeIdx].congestionCoeff;
+                cnt++;
+            }
+            if (cnt > 0) {
+                avgC /= cnt;
+                const bw = 30, bh = 4;
+                const bx = node.x - bw/2, by = node.y - 18;
+                noStroke();
+                fill(33, 38, 45, 180);
+                rect(bx, by, bw, bh, 2);
+                const bc = congestionColor(avgC);
+                fill(bc[0], bc[1], bc[2], 200);
+                rect(bx, by, bw * Math.min(avgC, 1), bh, 2);
+            }
+        }
+    }
+
+    // ━━━ DRAW VEHICLE ━━━
+    if (planner.active && planner.path && !planner.arrived) {
+        const vp = planner.vehiclePos();
+        if (vp) {
+            // Shadow
+            noStroke();
+            fill(0, 0, 0, 50);
+            ellipse(vp.x + 3, vp.y + 3, 22);
+
+            // Glow
+            for (let r = 20; r > 0; r -= 4) {
+                fill(240, 136, 62, (20 - r) * 6);
+                ellipse(vp.x, vp.y, r * 2);
+            }
+
+            // Body
+            strokeWeight(2);
+            stroke(255, 200, 100);
+            fill(240, 136, 62);
+            ellipse(vp.x, vp.y, 16);
+
+            // Icon
+            noStroke();
+            fill(255);
+            textSize(10);
+            textAlign(CENTER, CENTER);
+            text('🚗', vp.x, vp.y);
+
+            // Direction arrow
+            if (planner.pathIdx < planner.path.length - 1) {
+                const next = NODES[planner.path[planner.pathIdx + 1]];
+                const ang = atan2(next.y - vp.y, next.x - vp.x);
+                stroke(255, 200, 100, 150);
+                strokeWeight(2);
+                line(vp.x, vp.y, vp.x + cos(ang) * 18, vp.y + sin(ang) * 18);
+            }
+        }
+    }
+
+    // ━━━ ARRIVED MARKER ━━━
+    if (planner.arrived) {
+        const dn = NODES[planner.dst];
+        const ps = 20 + sin(frameCount * 0.1) * 8;
+        noFill();
+        strokeWeight(3);
+        stroke(63, 185, 80, 150);
+        ellipse(dn.x, dn.y, ps);
+        ellipse(dn.x, dn.y, ps * 1.5);
+        noStroke();
+        fill(63, 185, 80, 200);
+        textSize(12);
+        textAlign(CENTER, BOTTOM);
+        text('✅ ARRIVED', dn.x, dn.y - 22);
+    }
+
+    // ━━━ INFO OVERLAY ━━━
+    noStroke();
+    fill(88, 166, 255, 180);
+    textSize(14);
+    textAlign(LEFT, TOP);
+    text('Dhaka City Road Network', 15, 15);
+
+    fill(139, 148, 158, 140);
+    textSize(9);
+    text(`L=${CONFIG.VEHICLE_LENGTH}m  |  ${graph.edges.length} edges  |  ${graph.numNodes} nodes`, 15, 35);
+
+    // Clock overlay
+    fill(33, 38, 45, 210);
+    noStroke();
+    const clkX = 850 - 145;
+    rect(clkX, 10, 130, 35, 6);
+    fill(240, 136, 62);
+    textSize(16);
+    textAlign(CENTER, CENTER);
+    text(`🕐 ${formatHour(simHour)}`, clkX + 65, 27);
+
+    // ━━━ CONGESTION SCALE BAR ━━━
+    const sbX = 15, sbY = 595, sbW = 200, sbH = 8;
+    fill(33, 38, 45, 200);
+    noStroke();
+    rect(sbX - 5, sbY - 18, sbW + 10, 40, 4);
+
+    fill(139, 148, 158, 200);
+    textSize(8);
+    textAlign(LEFT, BOTTOM);
+    text('Congestion Level', sbX, sbY - 4);
+
+    for (let i = 0; i < sbW; i++) {
+        const col = congestionColor((i / sbW) * 1.2);
+        stroke(col[0], col[1], col[2]);
+        line(sbX + i, sbY, sbX + i, sbY + sbH);
+    }
+
+    noStroke();
+    fill(139, 148, 158, 200);
+    textSize(7);
+    textAlign(LEFT, TOP);   text('0%',   sbX,           sbY + sbH + 2);
+    textAlign(CENTER, TOP); text('50%',  sbX + sbW / 2, sbY + sbH + 2);
+    textAlign(RIGHT, TOP);  text('100%+', sbX + sbW,     sbY + sbH + 2);
+
+    // ━━━ PSO CONVERGENCE GRAPH ━━━
+    if (psoResult && psoResult.convergence.length > 1) {
+        const gx = 670, gy = 510, gw = 160, gh = 75;
+        const data = psoResult.convergence;
+        const dMax = Math.max(...data) * 1.1;
+        const dMin = Math.min(...data) * 0.9;
+        const range = dMax - dMin || 1;
+
+        fill(33, 38, 45, 220);
+        noStroke();
+        rect(gx - 5, gy - 18, gw + 15, gh + 28, 6);
+
+        fill(139, 148, 158, 200);
+        textSize(8);
+        textAlign(LEFT, BOTTOM);
+        text('PSO Convergence', gx, gy - 4);
+
+        // Grid
+        stroke(48, 54, 61, 80);
+        strokeWeight(0.5);
+        for (let i = 0; i <= 4; i++) line(gx, gy + gh * i / 4, gx + gw, gy + gh * i / 4);
+
+        // Line
+        stroke(88, 166, 255, 200);
+        strokeWeight(1.5);
+        noFill();
+        beginShape();
+        for (let i = 0; i < data.length; i++) {
+            vertex(gx + (i / (data.length - 1)) * gw,
+                   gy + gh - ((data[i] - dMin) / range) * gh);
+        }
+        endShape();
+
+        // End dot
+        const lx = gx + gw;
+        const ly = gy + gh - ((data[data.length-1] - dMin) / range) * gh;
+        fill(88, 166, 255);
+        noStroke();
+        ellipse(lx, ly, 5);
+
+        // Axis labels
+        fill(139, 148, 158, 150);
+        textSize(7);
+        textAlign(RIGHT, TOP);    text(dMax.toFixed(0), gx - 3, gy);
+        textAlign(RIGHT, BOTTOM); text(dMin.toFixed(0), gx - 3, gy + gh);
+        textAlign(CENTER, TOP);   text('Iteration', gx + gw / 2, gy + gh + 3);
+    }
+
+    // ━━━ EDGE TOOLTIP ON HOVER ━━━
+    const mxs = (mouseX - ox) / sc;
+    const mys = (mouseY - oy) / sc;
+
+    let hovEdge = null, hovDist = Infinity;
+    for (const e of graph.edges) {
+        const a = NODES[e.from], b = NODES[e.to];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const lenSq = dx*dx + dy*dy;
+        let t = lenSq > 0 ? ((mxs - a.x)*dx + (mys - a.y)*dy) / lenSq : 0;
+        t = clamp(t, 0, 1);
+        const cx = a.x + t*dx, cy = a.y + t*dy;
+        const d = Math.sqrt((mxs-cx)**2 + (mys-cy)**2);
+        if (d < 15 && d < hovDist) { hovDist = d; hovEdge = e; }
+    }
+
+    if (hovEdge) {
+        const e = hovEdge;
+        const a = NODES[e.from], b = NODES[e.to];
+        const tx = (a.x+b.x)/2 + 15, ty = (a.y+b.y)/2 - 65;
+        const tw = 185, th = 110;
+
+        fill(22, 27, 34, 245);
+        stroke(48, 54, 61);
+        strokeWeight(1);
+        rect(tx, ty, tw, th, 6);
+
+        noStroke();
+        fill(88, 166, 255);
+        textSize(10); textAlign(LEFT, TOP);
+        text(`${NODES[e.from].name} ↔ ${NODES[e.to].name}`, tx+8, ty+8);
+
+        fill(201, 209, 217, 200);
+        textSize(8);
+        let ly = ty + 26;
+        const lh = 13;
+        text(`Distance (d): ${e.distance} m`, tx+8, ly); ly += lh;
+        text(`Lanes (l): ${e.lanes}`, tx+8, ly); ly += lh;
+        text(`Vehicles: ${e.vehicleCount.toFixed(0)}`, tx+8, ly); ly += lh;
+        text(`C(t): ${(e.congestionCoeff*100).toFixed(1)}%`, tx+8, ly); ly += lh;
+        text(`R(t): ${e.roadFactor.toFixed(1)}`, tx+8, ly); ly += lh;
+        const cap = RoadCalc.capacity(e);
+        text(`Utilization: ${(cap.utilization*100).toFixed(1)}%`, tx+8, ly);
+
+        // Highlight edge
+        strokeWeight(e.lanes * 2 + 6);
+        stroke(255, 255, 255, 35);
+        line(a.x, a.y, b.x, b.y);
+    }
+
+    // ━━━ NODE TOOLTIP ━━━
+    if (!hovEdge) {
+        for (const node of NODES) {
+            if (Math.sqrt((mxs-node.x)**2 + (mys-node.y)**2) < 18) {
+                const tx = node.x + 18, ty = node.y - 42;
+                fill(22, 27, 34, 245);
+                stroke(48, 54, 61); strokeWeight(1);
+                rect(tx, ty, 145, 55, 6);
+
+                noStroke();
+                fill(88, 166, 255); textSize(10); textAlign(LEFT, TOP);
+                text(`📍 ${node.name}`, tx+8, ty+8);
+                fill(201, 209, 217, 200); textSize(8);
+                text(`Node ID: ${node.id}`, tx+8, ty+25);
+                text(`Connections: ${graph.adj[node.id].length}`, tx+8, ty+38);
+
+                noFill(); strokeWeight(2); stroke(255,255,255,80);
+                ellipse(node.x, node.y, 28);
+                break;
+            }
+        }
+    }
+
+    pop(); // end canvas transform
+
+    // ━━━ ANIMATED ANT PARTICLES ━━━
+    if (improvedPath && improvedPath.length > 1) {
+        push();
+        translate(ox, oy);
+        scale(sc);
+
+        // Spawn
+        if (frameCount % 20 === 0 && antParticles.length < 8) {
+            antParticles.push({
+                seg: Math.floor(Math.random() * (improvedPath.length - 1)),
+                t:   0,
+                spd: 0.008 + Math.random() * 0.012,
+            });
+        }
+
+        // Update & draw
+        for (let i = antParticles.length - 1; i >= 0; i--) {
+            const ap = antParticles[i];
+            ap.t += ap.spd * spd;
+            if (ap.t >= 1) { ap.seg++; ap.t = 0; }
+            if (ap.seg >= improvedPath.length - 1) { antParticles.splice(i, 1); continue; }
+
+            const na = NODES[improvedPath[ap.seg]];
+            const nb = NODES[improvedPath[ap.seg + 1]];
+            const ax = na.x + (nb.x - na.x) * ap.t;
+            const ay = na.y + (nb.y - na.y) * ap.t;
+
+            noStroke();
+            fill(88, 166, 255, 60);
+            ellipse(ax, ay, 8);
+            fill(88, 166, 255, 160);
+            ellipse(ax, ay, 4);
+        }
+
+        pop();
+    }
+
+    // ━━━ FPS ━━━
+    fill(139, 148, 158, 80);
+    noStroke();
+    textSize(10);
+    textAlign(RIGHT, BOTTOM);
+    text(`FPS: ${Math.round(frameRate())}`, width - 10, height - 5);
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 18 ▸ MOUSE INTERACTION
+// ────────────────────────────────────────────────────────
+function mousePressed() {
+    const holder = document.getElementById('canvas-holder');
+    const sx = holder.offsetWidth / 850;
+    const sy = holder.offsetHeight / 620;
+    const sc = Math.min(sx, sy, 1.4);
+    const ox = (holder.offsetWidth - 850 * sc) / 2;
+    const oy = (holder.offsetHeight - 620 * sc) / 2;
+
+    const mx = (mouseX - ox) / sc;
+    const my = (mouseY - oy) / sc;
+
+    for (const node of NODES) {
+        if (Math.sqrt((mx - node.x)**2 + (my - node.y)**2) < 18) {
+            if (mouseButton === LEFT) {
+                if (keyIsDown(SHIFT)) {
+                    document.getElementById('dest-select').value = node.id;
+                    addLog(`📍 Destination → ${node.name}`, 'info');
+                } else {
+                    document.getElementById('source-select').value = node.id;
+                    addLog(`📍 Source → ${node.name}`, 'info');
+                }
+            }
+            break;
+        }
+    }
+}
+
+// ────────────────────────────────────────────────────────
+// SECTION 19 ▸ KEYBOARD SHORTCUTS
+// ────────────────────────────────────────────────────────
+function keyPressed() {
+    switch (key.toUpperCase()) {
+        case 'P': actionPSO();         break;
+        case 'A': actionACOImproved(); break;
+        case 'S': actionACOStandard(); break;
+        case 'R': actionReset();       break;
+        case 'C': actionCompare();     break;
+        case 'I': actionIncident();    break;
+        case ' ':
+            if (simRunning) actionStop(); else actionStart();
+            return false;
+        case '+': case '=': {
+            const el = document.getElementById('sim-speed');
+            el.value = Math.min(10, parseInt(el.value) + 1);
+            document.getElementById('sim-speed-val').textContent = el.value;
+            break;
+        }
+        case '-': case '_': {
+            const el = document.getElementById('sim-speed');
+            el.value = Math.max(1, parseInt(el.value) - 1);
+            document.getElementById('sim-speed-val').textContent = el.value;
+            break;
+        }
+    }
+}
+</script>
+</body>
+</html>

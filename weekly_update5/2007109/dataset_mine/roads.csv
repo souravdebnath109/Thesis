@@ -1,0 +1,59 @@
+road_id,road_name,from_intersection,to_intersection,length_meters,num_lanes,is_bidirectional,road_type,speed_limit,has_bus_lane
+0,Elephant Road,0,19,1200.0,4,True,main,40.0,True
+1,Karwan Bazar Road,19,2,800.0,4,True,main,40.0,False
+2,Tejgaon Link Road,2,1,1000.0,4,True,main,40.0,False
+3,Farmgate-Tejgaon Road,1,26,700.0,4,True,main,40.0,True
+4,Mohakhali Link,26,3,1500.0,4,True,main,40.0,False
+5,Banani Road,3,4,1800.0,3,True,secondary,30.0,False
+6,Gulshan Avenue,4,5,1000.0,3,True,secondary,30.0,False
+7,Gulshan Link Road,5,6,1200.0,3,True,secondary,30.0,False
+8,Badda Link,6,7,2000.0,3,True,secondary,30.0,False
+9,Rampura Road,7,8,1500.0,3,True,secondary,30.0,False
+10,Malibagh Road,8,9,1800.0,4,True,main,40.0,True
+11,Mouchak-Malibagh,9,10,500.0,4,True,main,40.0,False
+12,Moghbazar Road,10,11,600.0,4,True,main,40.0,True
+13,Shahbag Link,11,0,1000.0,4,True,main,40.0,False
+14,Bangla Motor Road,0,12,800.0,3,True,secondary,30.0,False
+15,Shantinagar-Kakrail,12,13,600.0,3,True,secondary,30.0,False
+16,Paltan Road,13,14,700.0,4,True,main,40.0,False
+17,Motijheel Link,14,15,800.0,4,True,main,40.0,False
+18,Jatrabari Road,15,23,3500.0,4,True,main,40.0,False
+19,Sayedabad Link,23,24,1000.0,3,True,secondary,30.0,False
+20,Dhanmondi 27 Road,0,16,1500.0,3,True,secondary,30.0,False
+21,Dhanmondi Internal,16,17,800.0,2,True,secondary,30.0,False
+22,Kalabagan Road,17,18,700.0,3,True,secondary,30.0,False
+23,Science Lab Link,18,19,500.0,3,True,secondary,30.0,False
+24,Nilkhet Road,19,20,600.0,3,True,secondary,30.0,False
+25,New Market Road,20,21,500.0,3,True,secondary,30.0,False
+26,Azimpur Road,21,22,1000.0,3,True,secondary,30.0,False
+27,Russell Square Road,1,29,600.0,4,True,main,40.0,False
+28,Panthpath Road,29,30,800.0,4,True,main,40.0,False
+29,Sonargaon Road,30,31,500.0,4,True,main,40.0,False
+30,Karwan Bazar Link,31,2,400.0,4,True,main,40.0,False
+31,Bijoy Sarani Road,1,32,1200.0,4,True,main,40.0,False
+32,Agargaon Link,32,33,1500.0,4,True,main,40.0,False
+33,Mirpur Road Section 1,33,34,2500.0,4,True,main,40.0,False
+34,Mirpur Road Section 2,34,35,1800.0,4,True,main,40.0,False
+35,Mirpur Road Section 3,35,36,1500.0,3,True,secondary,30.0,False
+36,Kazipara Link,36,37,800.0,3,True,secondary,30.0,False
+37,Railgate Road,9,25,600.0,3,True,secondary,30.0,False
+38,Mouchak Link,25,10,500.0,3,True,secondary,30.0,False
+39,Asad Gate Road,27,28,1200.0,3,True,secondary,30.0,False
+40,Russell Square Link,28,29,900.0,3,True,secondary,30.0,False
+41,Mohammadpur-Dhanmondi,27,17,1500.0,3,True,secondary,30.0,False
+42,Elephant Road,19,0,1200.0,4,True,main,40.0,True
+43,Karwan Bazar Road,2,19,800.0,4,True,main,40.0,False
+44,Tejgaon Link Road,1,2,1000.0,4,True,main,40.0,False
+45,Farmgate-Tejgaon Road,26,1,700.0,4,True,main,40.0,False
+46,Mohakhali Link,3,26,1500.0,4,True,main,40.0,True
+47,Banani Road,4,3,1800.0,3,True,secondary,30.0,False
+48,Gulshan Avenue,5,4,1000.0,3,True,secondary,30.0,False
+49,Gulshan Link Road,6,5,1200.0,3,True,secondary,30.0,False
+50,Badda Link,7,6,2000.0,3,True,secondary,30.0,False
+51,Rampura Road,8,7,1500.0,3,True,secondary,30.0,False
+52,Malibagh Road,9,8,1800.0,4,True,main,40.0,False
+53,Mouchak-Malibagh,10,9,500.0,4,True,main,40.0,False
+54,Moghbazar Road,11,10,600.0,4,True,main,40.0,True
+55,Shahbag Link,0,11,1000.0,4,True,main,40.0,False
+56,Bangla Motor Road,12,0,800.0,3,True,secondary,30.0,False
+57,Shantinagar-Kakrail,13,12,600.0,3,True,secondary,30.0,False

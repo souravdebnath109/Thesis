@@ -1,0 +1,2679 @@
+﻿
+============================================================
+  PSO-ACO Dynamic Path Planner  (Wu et al. 2020)
+============================================================
+  Extended: ALL S-D Pairs + Combined Route Optimization
+
+[CFG] map=map_data.csv  pairs_file=sd_pairs.csv  combined_opt=1
+[MAP] 10 nodes, 30 directed edges loaded.
+
+[INIT] Initial Road Condition Factors:
+          Edge    Length   Lanes      C(t)      R(t)
+     0 ->    1     100.0       1    0.1500    115.00
+     1 ->    0     100.0       1    0.0500    105.00
+     1 ->    2     100.0       1    0.5500    155.00
+     2 ->    1     100.0       1    0.1000    110.00
+     2 ->    3     100.0       1    0.0000    100.00
+     3 ->    2     100.0       1    0.0000    100.00
+     4 ->    5     100.0       3    0.2167    121.67
+     5 ->    4     100.0       3    0.0000    100.00
+     5 ->    6     100.0       2    0.2250    122.50
+     6 ->    5     100.0       2    0.1750    117.50
+     6 ->    7     100.0       1    0.2500    125.00
+     7 ->    6     100.0       1    0.1500    115.00
+     8 ->    9     100.0       3    0.2833    128.33
+     9 ->    8     100.0       3    0.0167    101.67
+     0 ->    4     100.0       2    0.5250    152.50
+     4 ->    0     100.0       2    0.0250    102.50
+     1 ->    5     100.0       2    0.1250    112.50
+     5 ->    1     100.0       2    0.0250    102.50
+     2 ->    6     100.0       2    0.2000    120.00
+     6 ->    2     100.0       2    0.0750    107.50
+     3 ->    7     100.0       2    0.4750    147.50
+     7 ->    3     100.0       2    0.1750    117.50
+     4 ->    8     141.4       2    0.3536    191.42
+     8 ->    4     141.4       2    0.0354    146.42
+     5 ->    8     100.0       2    0.4000    140.00
+     8 ->    5     100.0       2    0.1000    110.00
+     5 ->    9     141.4       3    0.3653    193.09
+     9 ->    5     141.4       3    0.1179    158.09
+     6 ->    9     100.0       2    0.5250    152.50
+     9 ->    6     100.0       2    0.3000    130.00
+
+[PAIRS] 17 source-destination pairs loaded from sd_pairs.csv:
+  P0: 0 -> 9
+  P1: 0 -> 7
+  P2: 0 -> 3
+  P3: 1 -> 8
+  P4: 1 -> 9
+  P5: 2 -> 8
+  P6: 2 -> 9
+  P7: 3 -> 9
+  P8: 4 -> 7
+  P9: 4 -> 9
+  P10: 5 -> 9
+  P11: 6 -> 9
+  P12: 7 -> 0
+  P13: 7 -> 9
+  P14: 8 -> 1
+  P15: 9 -> 0
+  P16: 9 -> 3
+
+============================================================
+  STEP A: INDEPENDENT OPTIMIZATION
+============================================================
+
+============================================================
+  PAIR 0 (0 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 420.59  alpha=0.505  beta=1.049  rho=0.773
+  iter   25  |  best_cost = 420.59  alpha=0.505  beta=1.049  rho=0.773
+  iter   50  |  best_cost = 420.59  alpha=0.505  beta=1.049  rho=0.773
+  iter   75  |  best_cost = 420.59  alpha=0.505  beta=1.049  rho=0.773
+  iter  100  |  best_cost = 420.59  alpha=0.505  beta=1.049  rho=0.773
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.5053
+        beta  = 1.0488
+        rho   = 0.7727
+        best_cost = 420.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=420.59  path: 0 -> 1 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=127.57  dR=12.57  ar=127.57  <- TRIGGER  -> keep existing (new=328.56 >= rem=328.56)
+  [STEP  1] node= 5  R=138.81  dR=15.30  ar=266.38  <- TRIGGER  -> keep existing (new=221.66 >= rem=221.66)
+  [STEP  2] node= 9  R=236.44  dR=14.78  ar=502.82
+
+  [OK] Destination 9 reached at step 2!
+
+  --- PAIR 0 FINAL REPORT ---
+  Source        : 0
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 420.59
+  Final cost(ar): 502.82
+  Initial path  : 0->1->5->9
+  Final path    : 0->1->5->9
+  PSO params    : alpha=0.505  beta=1.049  rho=0.773
+
+============================================================
+  PAIR 1 (0 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 475.00  alpha=0.847  beta=4.318  rho=0.702
+  iter   25  |  best_cost = 475.00  alpha=0.847  beta=4.318  rho=0.702
+  iter   50  |  best_cost = 475.00  alpha=0.847  beta=4.318  rho=0.702
+  iter   75  |  best_cost = 475.00  alpha=0.847  beta=4.318  rho=0.702
+  iter  100  |  best_cost = 475.00  alpha=0.847  beta=4.318  rho=0.702
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.8472
+        beta  = 4.3177
+        rho   = 0.7020
+        best_cost = 475.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=475.00  path: 0 -> 1 -> 5 -> 6 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=129.79  dR=14.79  ar=129.79  <- TRIGGER  -> keep existing (new=361.83 >= rem=361.83)
+  [STEP  1] node= 5  R=120.35  dR=3.56  ar=250.14
+  [STEP  2] node= 6  R=125.67  dR=0.60  ar=375.81
+  [STEP  3] node= 7  R=112.44  dR=2.49  ar=488.25
+
+  [OK] Destination 7 reached at step 3!
+
+  --- PAIR 1 FINAL REPORT ---
+  Source        : 0
+  Destination   : 7
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 475.00
+  Final cost(ar): 488.25
+  Initial path  : 0->1->5->6->7
+  Final path    : 0->1->5->6->7
+  PSO params    : alpha=0.847  beta=4.318  rho=0.702
+
+============================================================
+  PAIR 2 (0 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 370.00  alpha=1.301  beta=1.508  rho=0.654
+  iter   25  |  best_cost = 370.00  alpha=1.301  beta=1.508  rho=0.654
+  iter   50  |  best_cost = 370.00  alpha=1.301  beta=1.508  rho=0.654
+  iter   75  |  best_cost = 370.00  alpha=1.301  beta=1.508  rho=0.654
+  iter  100  |  best_cost = 370.00  alpha=1.301  beta=1.508  rho=0.654
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3007
+        beta  = 1.5080
+        rho   = 0.6540
+        best_cost = 370.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=370.00  path: 0 -> 1 -> 2 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=138.44  dR=23.44  ar=138.44  <- TRIGGER  -> REROUTE (new=258.00 < rem=258.00)
+  [STEP  1] node= 2  R=172.79  dR=14.79  ar=311.23  <- TRIGGER  -> keep existing (new=100.00 >= rem=100.00)
+  [STEP  2] node= 3  R=100.00  dR=0.00  ar=411.23
+
+  [OK] Destination 3 reached at step 2!
+
+  --- PAIR 2 FINAL REPORT ---
+  Source        : 0
+  Destination   : 3
+  Reached       : YES
+  Reroutes      : 1
+  Initial cost  : 370.00
+  Final cost(ar): 411.23
+  Initial path  : 0->1->2->3
+  Final path    : 1->2->3
+  PSO params    : alpha=1.301  beta=1.508  rho=0.654
+
+============================================================
+  PAIR 3 (1 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 252.50  alpha=0.641  beta=3.106  rho=0.940
+  iter   25  |  best_cost = 252.50  alpha=0.641  beta=3.106  rho=0.940
+  iter   50  |  best_cost = 252.50  alpha=0.641  beta=3.106  rho=0.940
+  iter   75  |  best_cost = 252.50  alpha=0.641  beta=3.106  rho=0.940
+  iter  100  |  best_cost = 252.50  alpha=0.641  beta=3.106  rho=0.940
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6407
+        beta  = 3.1058
+        rho   = 0.9404
+        best_cost = 252.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=252.50  path: 1 -> 5 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=122.11  dR=9.61  ar=122.11  <- TRIGGER  -> REROUTE (new=147.50 < rem=147.50)
+  [STEP  1] node= 8  R=152.02  dR=4.52  ar=274.12
+
+  [OK] Destination 8 reached at step 1!
+
+  --- PAIR 3 FINAL REPORT ---
+  Source        : 1
+  Destination   : 8
+  Reached       : YES
+  Reroutes      : 1
+  Initial cost  : 252.50
+  Final cost(ar): 274.12
+  Initial path  : 1->5->8
+  Final path    : 5->8
+  PSO params    : alpha=0.641  beta=3.106  rho=0.940
+
+============================================================
+  PAIR 4 (1 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 305.59  alpha=0.784  beta=1.189  rho=0.789
+  iter   25  |  best_cost = 305.59  alpha=0.784  beta=1.189  rho=0.789
+  iter   50  |  best_cost = 305.59  alpha=0.784  beta=1.189  rho=0.789
+  iter   75  |  best_cost = 305.59  alpha=0.784  beta=1.189  rho=0.789
+  iter  100  |  best_cost = 305.59  alpha=0.784  beta=1.189  rho=0.789
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7844
+        beta  = 1.1887
+        rho   = 0.7893
+        best_cost = 305.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=380.83  path: 1 -> 5 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=119.34  dR=6.84  ar=119.34  <- TRIGGER  -> REROUTE (new=223.15 < rem=281.43)
+  [STEP  1] node= 9  R=249.68  dR=26.53  ar=369.02
+
+  [OK] Destination 9 reached at step 1!
+
+  --- PAIR 4 FINAL REPORT ---
+  Source        : 1
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 1
+  Initial cost  : 380.83
+  Final cost(ar): 369.02
+  Initial path  : 1->5->8->9
+  Final path    : 5->9
+  PSO params    : alpha=0.784  beta=1.189  rho=0.789
+
+============================================================
+  PAIR 5 (2 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 362.50  alpha=0.504  beta=2.973  rho=0.582
+  iter   25  |  best_cost = 362.50  alpha=0.504  beta=2.973  rho=0.582
+  iter   50  |  best_cost = 362.50  alpha=0.504  beta=2.973  rho=0.582
+  iter   75  |  best_cost = 362.50  alpha=0.504  beta=2.973  rho=0.582
+  iter  100  |  best_cost = 362.50  alpha=0.504  beta=2.973  rho=0.582
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.5039
+        beta  = 2.9734
+        rho   = 0.5824
+        best_cost = 362.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=362.50  path: 2 -> 1 -> 5 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=101.58  dR=8.42  ar=101.58  <- TRIGGER  -> keep existing (new=267.69 >= rem=267.69)
+  [STEP  1] node= 5  R=131.56  dR=10.23  ar=233.14  <- TRIGGER  -> keep existing (new=154.57 >= rem=154.57)
+  [STEP  2] node= 8  R=160.68  dR=6.12  ar=393.82
+
+  [OK] Destination 8 reached at step 2!
+
+  --- PAIR 5 FINAL REPORT ---
+  Source        : 2
+  Destination   : 8
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 362.50
+  Final cost(ar): 393.82
+  Initial path  : 2->1->5->8
+  Final path    : 2->1->5->8
+  PSO params    : alpha=0.504  beta=2.973  rho=0.582
+
+============================================================
+  PAIR 6 (2 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 272.50  alpha=1.423  beta=1.228  rho=0.748
+  iter   25  |  best_cost = 272.50  alpha=1.423  beta=1.228  rho=0.748
+  iter   50  |  best_cost = 272.50  alpha=1.423  beta=1.228  rho=0.748
+  iter   75  |  best_cost = 272.50  alpha=1.423  beta=1.228  rho=0.748
+  iter  100  |  best_cost = 272.50  alpha=1.423  beta=1.228  rho=0.748
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4229
+        beta  = 1.2277
+        rho   = 0.7479
+        best_cost = 272.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=272.50  path: 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=127.82  dR=7.82  ar=127.82  <- TRIGGER  -> keep existing (new=160.07 >= rem=160.07)
+  [STEP  1] node= 9  R=163.42  dR=3.36  ar=291.25
+
+  [OK] Destination 9 reached at step 1!
+
+  --- PAIR 6 FINAL REPORT ---
+  Source        : 2
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 272.50
+  Final cost(ar): 291.25
+  Initial path  : 2->6->9
+  Final path    : 2->6->9
+  PSO params    : alpha=1.423  beta=1.228  rho=0.748
+
+============================================================
+  PAIR 7 (3 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 372.50  alpha=0.769  beta=1.899  rho=0.913
+  iter   25  |  best_cost = 372.50  alpha=0.769  beta=1.899  rho=0.913
+  iter   50  |  best_cost = 372.50  alpha=0.769  beta=1.899  rho=0.913
+  iter   75  |  best_cost = 372.50  alpha=0.769  beta=1.899  rho=0.913
+  iter  100  |  best_cost = 372.50  alpha=0.769  beta=1.899  rho=0.913
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7686
+        beta  = 1.8991
+        rho   = 0.9128
+        best_cost = 372.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=372.50  path: 3 -> 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 2  R=100.00  dR=0.00  ar=100.00
+  [STEP  1] node= 6  R=130.64  dR=6.84  ar=230.64  <- TRIGGER  -> REROUTE (new=174.85 < rem=174.85)
+  [STEP  2] node= 9  R=195.48  dR=20.63  ar=426.12
+
+  [OK] Destination 9 reached at step 2!
+
+  --- PAIR 7 FINAL REPORT ---
+  Source        : 3
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 1
+  Initial cost  : 372.50
+  Final cost(ar): 426.12
+  Initial path  : 3->2->6->9
+  Final path    : 6->9
+  PSO params    : alpha=0.769  beta=1.899  rho=0.913
+
+============================================================
+  PAIR 8 (4 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 369.17  alpha=0.962  beta=1.664  rho=0.664
+  iter   25  |  best_cost = 369.17  alpha=0.962  beta=1.664  rho=0.664
+  iter   50  |  best_cost = 369.17  alpha=0.962  beta=1.664  rho=0.664
+  iter   75  |  best_cost = 369.17  alpha=0.962  beta=1.664  rho=0.664
+  iter  100  |  best_cost = 369.17  alpha=0.962  beta=1.664  rho=0.664
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.9623
+        beta  = 1.6638
+        rho   = 0.6645
+        best_cost = 369.1667
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=369.17  path: 4 -> 5 -> 6 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=133.46  dR=11.80  ar=133.46  <- TRIGGER  -> REROUTE (new=248.37 < rem=248.37)
+  [STEP  1] node= 6  R=128.54  dR=2.14  ar=262.00
+  [STEP  2] node= 7  R=119.20  dR=1.22  ar=381.21
+
+  [OK] Destination 7 reached at step 2!
+
+  --- PAIR 8 FINAL REPORT ---
+  Source        : 4
+  Destination   : 7
+  Reached       : YES
+  Reroutes      : 1
+  Initial cost  : 369.17
+  Final cost(ar): 381.21
+  Initial path  : 4->5->6->7
+  Final path    : 5->6->7
+  PSO params    : alpha=0.962  beta=1.664  rho=0.664
+
+============================================================
+  PAIR 9 (4 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 314.75  alpha=1.019  beta=2.238  rho=0.847
+  iter   25  |  best_cost = 314.75  alpha=1.019  beta=2.238  rho=0.847
+  iter   50  |  best_cost = 314.75  alpha=1.019  beta=2.238  rho=0.847
+  iter   75  |  best_cost = 314.75  alpha=1.019  beta=2.238  rho=0.847
+  iter  100  |  best_cost = 314.75  alpha=1.019  beta=2.238  rho=0.847
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.0193
+        beta  = 2.2384
+        rho   = 0.8471
+        best_cost = 314.7533
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=314.75  path: 4 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=141.66  dR=19.99  ar=141.66  <- TRIGGER  -> keep existing (new=274.73 >= rem=206.37)
+  [STEP  1] node= 9  R=212.03  dR=5.65  ar=353.68
+
+  [OK] Destination 9 reached at step 1!
+
+  --- PAIR 9 FINAL REPORT ---
+  Source        : 4
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 314.75
+  Final cost(ar): 353.68
+  Initial path  : 4->5->9
+  Final path    : 4->5->9
+  PSO params    : alpha=1.019  beta=2.238  rho=0.847
+
+============================================================
+  PAIR 10 (5 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 193.09  alpha=0.886  beta=3.658  rho=0.871
+  iter   25  |  best_cost = 193.09  alpha=0.886  beta=3.658  rho=0.871
+  iter   50  |  best_cost = 193.09  alpha=0.886  beta=3.658  rho=0.871
+  iter   75  |  best_cost = 193.09  alpha=0.886  beta=3.658  rho=0.871
+  iter  100  |  best_cost = 193.09  alpha=0.886  beta=3.658  rho=0.871
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.8856
+        beta  = 3.6582
+        rho   = 0.8710
+        best_cost = 193.0867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=193.09  path: 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 9  R=194.94  dR=1.86  ar=194.94
+
+  [OK] Destination 9 reached at step 0!
+
+  --- PAIR 10 FINAL REPORT ---
+  Source        : 5
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 193.09
+  Final cost(ar): 194.94
+  Initial path  : 5->9
+  Final path    : 5->9
+  PSO params    : alpha=0.886  beta=3.658  rho=0.871
+
+============================================================
+  PAIR 11 (6 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 152.50  alpha=1.302  beta=4.816  rho=0.922
+  iter   25  |  best_cost = 152.50  alpha=1.302  beta=4.816  rho=0.922
+  iter   50  |  best_cost = 152.50  alpha=1.302  beta=4.816  rho=0.922
+  iter   75  |  best_cost = 152.50  alpha=1.302  beta=4.816  rho=0.922
+  iter  100  |  best_cost = 152.50  alpha=1.302  beta=4.816  rho=0.922
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3025
+        beta  = 4.8159
+        rho   = 0.9223
+        best_cost = 152.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=310.59  path: 6 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=120.56  dR=3.06  ar=120.56
+  [STEP  1] node= 9  R=197.28  dR=1.97  ar=317.84
+
+  [OK] Destination 9 reached at step 1!
+
+  --- PAIR 11 FINAL REPORT ---
+  Source        : 6
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 310.59
+  Final cost(ar): 317.84
+  Initial path  : 6->5->9
+  Final path    : 6->5->9
+  PSO params    : alpha=1.302  beta=4.816  rho=0.922
+
+============================================================
+  PAIR 12 (7 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 432.50  alpha=1.371  beta=4.605  rho=0.530
+  iter   25  |  best_cost = 432.50  alpha=1.371  beta=4.605  rho=0.530
+  iter   50  |  best_cost = 432.50  alpha=1.371  beta=4.605  rho=0.530
+  iter   75  |  best_cost = 432.50  alpha=1.371  beta=4.605  rho=0.530
+  iter  100  |  best_cost = 432.50  alpha=1.371  beta=4.605  rho=0.530
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3713
+        beta  = 4.6046
+        rho   = 0.5297
+        best_cost = 432.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=432.50  path: 7 -> 3 -> 2 -> 1 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 3  R=116.93  dR=0.57  ar=116.93
+  [STEP  1] node= 2  R=100.00  dR=0.00  ar=216.93
+  [STEP  2] node= 1  R=120.79  dR=6.06  ar=337.72  <- TRIGGER  -> REROUTE (new=111.48 < rem=111.48)
+  [STEP  3] node= 0  R=113.62  dR=2.15  ar=451.35
+
+  [OK] Destination 0 reached at step 3!
+
+  --- PAIR 12 FINAL REPORT ---
+  Source        : 7
+  Destination   : 0
+  Reached       : YES
+  Reroutes      : 1
+  Initial cost  : 432.50
+  Final cost(ar): 451.35
+  Initial path  : 7->3->2->1->0
+  Final path    : 1->0
+  PSO params    : alpha=1.371  beta=4.605  rho=0.530
+
+============================================================
+  PAIR 13 (7 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 267.50  alpha=1.475  beta=4.285  rho=0.649
+  iter   25  |  best_cost = 267.50  alpha=1.475  beta=4.285  rho=0.649
+  iter   50  |  best_cost = 267.50  alpha=1.475  beta=4.285  rho=0.649
+  iter   75  |  best_cost = 267.50  alpha=1.475  beta=4.285  rho=0.649
+  iter  100  |  best_cost = 267.50  alpha=1.475  beta=4.285  rho=0.649
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4751
+        beta  = 4.2853
+        rho   = 0.6486
+        best_cost = 267.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=267.50  path: 7 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=120.49  dR=5.49  ar=120.49  <- TRIGGER  -> keep existing (new=155.44 >= rem=155.44)
+  [STEP  1] node= 9  R=170.17  dR=14.73  ar=290.65
+
+  [OK] Destination 9 reached at step 1!
+
+  --- PAIR 13 FINAL REPORT ---
+  Source        : 7
+  Destination   : 9
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 267.50
+  Final cost(ar): 290.65
+  Initial path  : 7->6->9
+  Final path    : 7->6->9
+  PSO params    : alpha=1.475  beta=4.285  rho=0.649
+
+============================================================
+  PAIR 14 (8 -> 1)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 212.50  alpha=1.471  beta=1.360  rho=0.606
+  iter   25  |  best_cost = 212.50  alpha=1.471  beta=1.360  rho=0.606
+  iter   50  |  best_cost = 212.50  alpha=1.471  beta=1.360  rho=0.606
+  iter   75  |  best_cost = 212.50  alpha=1.471  beta=1.360  rho=0.606
+  iter  100  |  best_cost = 212.50  alpha=1.471  beta=1.360  rho=0.606
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4708
+        beta  = 1.3595
+        rho   = 0.6060
+        best_cost = 212.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=212.50  path: 8 -> 5 -> 1
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=112.72  dR=2.72  ar=112.72
+  [STEP  1] node= 1  R=104.83  dR=1.41  ar=217.55
+
+  [OK] Destination 1 reached at step 1!
+
+  --- PAIR 14 FINAL REPORT ---
+  Source        : 8
+  Destination   : 1
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 212.50
+  Final cost(ar): 217.55
+  Initial path  : 8->5->1
+  Final path    : 8->5->1
+  PSO params    : alpha=1.471  beta=1.360  rho=0.606
+
+============================================================
+  PAIR 15 (9 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 350.59  alpha=0.940  beta=1.989  rho=0.957
+  iter   25  |  best_cost = 350.59  alpha=0.940  beta=1.989  rho=0.957
+  iter   50  |  best_cost = 350.59  alpha=0.940  beta=1.989  rho=0.957
+  iter   75  |  best_cost = 350.59  alpha=0.940  beta=1.989  rho=0.957
+  iter  100  |  best_cost = 350.59  alpha=0.940  beta=1.989  rho=0.957
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.9396
+        beta  = 1.9890
+        rho   = 0.9566
+        best_cost = 350.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=350.59  path: 9 -> 8 -> 4 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 8  R=103.96  dR=2.29  ar=103.96
+  [STEP  1] node= 4  R=153.23  dR=3.56  ar=257.19  <- TRIGGER  -> REROUTE (new=111.18 < rem=111.18)
+  [STEP  2] node= 0  R=115.11  dR=3.93  ar=372.30
+
+  [OK] Destination 0 reached at step 2!
+
+  --- PAIR 15 FINAL REPORT ---
+  Source        : 9
+  Destination   : 0
+  Reached       : YES
+  Reroutes      : 1
+  Initial cost  : 350.59
+  Final cost(ar): 372.30
+  Initial path  : 9->8->4->0
+  Final path    : 4->0
+  PSO params    : alpha=0.940  beta=1.989  rho=0.957
+
+============================================================
+  PAIR 16 (9 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 337.50  alpha=0.724  beta=1.036  rho=0.831
+  iter   25  |  best_cost = 337.50  alpha=0.724  beta=1.036  rho=0.831
+  iter   50  |  best_cost = 337.50  alpha=0.724  beta=1.036  rho=0.831
+  iter   75  |  best_cost = 337.50  alpha=0.724  beta=1.036  rho=0.831
+  iter  100  |  best_cost = 337.50  alpha=0.724  beta=1.036  rho=0.831
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7236
+        beta  = 1.0355
+        rho   = 0.8311
+        best_cost = 337.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=337.50  path: 9 -> 6 -> 2 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=128.05  dR=1.95  ar=128.05
+  [STEP  1] node= 2  R=119.92  dR=7.28  ar=247.97  <- TRIGGER  -> keep existing (new=100.00 >= rem=100.00)
+  [STEP  2] node= 3  R=100.00  dR=0.00  ar=347.97
+
+  [OK] Destination 3 reached at step 2!
+
+  --- PAIR 16 FINAL REPORT ---
+  Source        : 9
+  Destination   : 3
+  Reached       : YES
+  Reroutes      : 0
+  Initial cost  : 337.50
+  Final cost(ar): 347.97
+  Initial path  : 9->6->2->3
+  Final path    : 9->6->2->3
+  PSO params    : alpha=0.724  beta=1.036  rho=0.831
+
+============================================================
+  INDEPENDENT OPTIMIZATION SUMMARY
+============================================================
+
+   Pair   Src   Dst   InitCost  FinalCost Reroutes  Reached  Final Path
+  --------------------------------------------------------------------------------
+      0     0     9     420.59     502.82        0      YES  0->1->5->9
+      1     0     7     475.00     488.25        0      YES  0->1->5->6->7
+      2     0     3     370.00     411.23        1      YES  1->2->3
+      3     1     8     252.50     274.12        1      YES  5->8
+      4     1     9     380.83     369.02        1      YES  5->9
+      5     2     8     362.50     393.82        0      YES  2->1->5->8
+      6     2     9     272.50     291.25        0      YES  2->6->9
+      7     3     9     372.50     426.12        1      YES  6->9
+      8     4     7     369.17     381.21        1      YES  5->6->7
+      9     4     9     314.75     353.68        0      YES  4->5->9
+     10     5     9     193.09     194.94        0      YES  5->9
+     11     6     9     310.59     317.84        0      YES  6->5->9
+     12     7     0     432.50     451.35        1      YES  1->0
+     13     7     9     267.50     290.65        0      YES  7->6->9
+     14     8     1     212.50     217.55        0      YES  8->5->1
+     15     9     0     350.59     372.30        1      YES  4->0
+     16     9     3     337.50     347.97        0      YES  9->6->2->3
+
+  Total pairs    : 17
+  Reached dest.  : 17 / 17
+  Total reroutes : 7
+  Avg final cost : 357.89
+
+  Results saved -> all_pairs_results.csv
+  Network analysis saved -> network_analysis.txt
+
+============================================================
+  STEP B: COMBINED ROUTE OPTIMIZATION
+============================================================
+  Max iterations    : 5
+  Traffic weight    : 0.30
+  Stability thresh  : 5.00%
+
+============================================================
+  COMBINED ITERATION 1 / 5
+============================================================
+
+============================================================
+  COMB-ITER 1  PAIR 0 (0 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 420.59  alpha=1.240  beta=1.592  rho=0.821
+  iter   25  |  best_cost = 420.59  alpha=1.240  beta=1.592  rho=0.821
+  iter   50  |  best_cost = 420.59  alpha=1.240  beta=1.592  rho=0.821
+  iter   75  |  best_cost = 420.59  alpha=1.240  beta=1.592  rho=0.821
+  iter  100  |  best_cost = 420.59  alpha=1.240  beta=1.592  rho=0.821
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.2396
+        beta  = 1.5918
+        rho   = 0.8207
+        best_cost = 420.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=472.25  path: 0 -> 4 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 4  R=159.32  dR=6.82  ar=159.32  <- TRIGGER  -> keep existing (new=317.48 >= rem=317.48)
+  [STEP  1] node= 8  R=187.83  dR=2.82  ar=347.15  <- TRIGGER  -> keep existing (new=120.89 >= rem=120.89)
+  [STEP  2] node= 9  R=110.74  dR=10.15  ar=457.89
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 0 0->9 cost=457.89 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 1 (0 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 475.00  alpha=0.745  beta=2.662  rho=0.619
+  iter   25  |  best_cost = 475.00  alpha=0.745  beta=2.662  rho=0.619
+  iter   50  |  best_cost = 475.00  alpha=0.745  beta=2.662  rho=0.619
+  iter   75  |  best_cost = 475.00  alpha=0.745  beta=2.662  rho=0.619
+  iter  100  |  best_cost = 475.00  alpha=0.745  beta=2.662  rho=0.619
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7446
+        beta  = 2.6622
+        rho   = 0.6186
+        best_cost = 475.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=475.00  path: 0 -> 1 -> 5 -> 6 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=132.39  dR=17.39  ar=132.39  <- TRIGGER  -> keep existing (new=365.32 >= rem=365.32)
+  [STEP  1] node= 5  R=128.46  dR=8.10  ar=260.86  <- TRIGGER  -> REROUTE (new=244.48 < rem=244.48)
+  [STEP  2] node= 6  R=127.50  dR=3.18  ar=388.36
+  [STEP  3] node= 7  R=116.80  dR=1.96  ar=505.16
+
+  [OK] Destination 7 reached at step 3!
+
+  Pair 1 0->7 cost=505.16 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 2 (0 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 370.00  alpha=1.320  beta=1.064  rho=0.656
+  iter   25  |  best_cost = 370.00  alpha=1.320  beta=1.064  rho=0.656
+  iter   50  |  best_cost = 370.00  alpha=1.320  beta=1.064  rho=0.656
+  iter   75  |  best_cost = 370.00  alpha=1.320  beta=1.064  rho=0.656
+  iter  100  |  best_cost = 370.00  alpha=1.320  beta=1.064  rho=0.656
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3202
+        beta  = 1.0645
+        rho   = 0.6557
+        best_cost = 370.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=370.00  path: 0 -> 1 -> 2 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=119.45  dR=4.45  ar=119.45
+  [STEP  1] node= 2  R=157.70  dR=2.62  ar=277.15  <- TRIGGER  -> keep existing (new=100.00 >= rem=100.00)
+  [STEP  2] node= 3  R=100.00  dR=0.00  ar=377.15
+
+  [OK] Destination 3 reached at step 2!
+
+  Pair 2 0->3 cost=377.15 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 3 (1 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 252.50  alpha=0.586  beta=1.188  rho=0.592
+  iter   25  |  best_cost = 252.50  alpha=0.586  beta=1.188  rho=0.592
+  iter   50  |  best_cost = 252.50  alpha=0.586  beta=1.188  rho=0.592
+  iter   75  |  best_cost = 252.50  alpha=0.586  beta=1.188  rho=0.592
+  iter  100  |  best_cost = 252.50  alpha=0.586  beta=1.188  rho=0.592
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.5863
+        beta  = 1.1876
+        rho   = 0.5917
+        best_cost = 252.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=252.50  path: 1 -> 5 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=123.69  dR=11.19  ar=123.69  <- TRIGGER  -> keep existing (new=149.97 >= rem=149.97)
+  [STEP  1] node= 8  R=160.55  dR=10.58  ar=284.24
+
+  [OK] Destination 8 reached at step 1!
+
+  Pair 3 1->8 cost=284.24 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 4 (1 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 305.59  alpha=1.160  beta=3.265  rho=0.854
+  iter   25  |  best_cost = 305.59  alpha=1.160  beta=3.265  rho=0.854
+  iter   50  |  best_cost = 305.59  alpha=1.160  beta=3.265  rho=0.854
+  iter   75  |  best_cost = 305.59  alpha=1.160  beta=3.265  rho=0.854
+  iter  100  |  best_cost = 305.59  alpha=1.160  beta=3.265  rho=0.854
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.1601
+        beta  = 3.2653
+        rho   = 0.8542
+        best_cost = 305.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=380.83  path: 1 -> 5 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=117.86  dR=5.36  ar=117.86  <- TRIGGER  -> REROUTE (new=281.75 < rem=281.75)
+  [STEP  1] node= 8  R=166.89  dR=14.03  ar=284.75  <- TRIGGER  -> REROUTE (new=126.62 < rem=126.62)
+  [STEP  2] node= 9  R=125.71  dR=0.92  ar=410.46
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 4 1->9 cost=410.46 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 5 (2 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 362.50  alpha=1.463  beta=1.875  rho=0.937
+  iter   25  |  best_cost = 362.50  alpha=1.463  beta=1.875  rho=0.937
+  iter   50  |  best_cost = 362.50  alpha=1.463  beta=1.875  rho=0.937
+  iter   75  |  best_cost = 362.50  alpha=1.463  beta=1.875  rho=0.937
+  iter  100  |  best_cost = 362.50  alpha=1.463  beta=1.875  rho=0.937
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4633
+        beta  = 1.8754
+        rho   = 0.9367
+        best_cost = 362.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=374.17  path: 2 -> 6 -> 9 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=127.31  dR=7.31  ar=127.31  <- TRIGGER  -> REROUTE (new=267.79 < rem=267.79)
+  [STEP  1] node= 9  R=187.28  dR=19.49  ar=314.59  <- TRIGGER  -> keep existing (new=100.99 >= rem=100.99)
+  [STEP  2] node= 8  R=100.00  dR=0.99  ar=414.59
+
+  [OK] Destination 8 reached at step 2!
+
+  Pair 5 2->8 cost=414.59 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 6 (2 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 272.50  alpha=0.610  beta=2.337  rho=0.502
+  iter   25  |  best_cost = 272.50  alpha=0.610  beta=2.337  rho=0.502
+  iter   50  |  best_cost = 272.50  alpha=0.610  beta=2.337  rho=0.502
+  iter   75  |  best_cost = 272.50  alpha=0.610  beta=2.337  rho=0.502
+  iter  100  |  best_cost = 272.50  alpha=0.610  beta=2.337  rho=0.502
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6100
+        beta  = 2.3370
+        rho   = 0.5025
+        best_cost = 272.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=272.50  path: 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=126.26  dR=6.26  ar=126.26  <- TRIGGER  -> REROUTE (new=150.95 < rem=150.95)
+  [STEP  1] node= 9  R=154.60  dR=3.65  ar=280.86
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 6 2->9 cost=280.86 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 7 (3 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 372.50  alpha=1.018  beta=3.677  rho=0.977
+  iter   25  |  best_cost = 372.50  alpha=1.018  beta=3.677  rho=0.977
+  iter   50  |  best_cost = 372.50  alpha=1.018  beta=3.677  rho=0.977
+  iter   75  |  best_cost = 372.50  alpha=1.018  beta=3.677  rho=0.977
+  iter  100  |  best_cost = 372.50  alpha=1.018  beta=3.677  rho=0.977
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.0179
+        beta  = 3.6770
+        rho   = 0.9770
+        best_cost = 372.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=372.50  path: 3 -> 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 2  R=100.00  dR=0.00  ar=100.00
+  [STEP  1] node= 6  R=123.97  dR=0.44  ar=223.97
+  [STEP  2] node= 9  R=110.62  dR=23.62  ar=334.59
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 7 3->9 cost=334.59 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 8 (4 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 369.17  alpha=0.866  beta=1.058  rho=0.551
+  iter   25  |  best_cost = 369.17  alpha=0.866  beta=1.058  rho=0.551
+  iter   50  |  best_cost = 369.17  alpha=0.866  beta=1.058  rho=0.551
+  iter   75  |  best_cost = 369.17  alpha=0.866  beta=1.058  rho=0.551
+  iter  100  |  best_cost = 369.17  alpha=0.866  beta=1.058  rho=0.551
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.8659
+        beta  = 1.0582
+        rho   = 0.5514
+        best_cost = 369.1667
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=369.17  path: 4 -> 5 -> 6 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=127.22  dR=5.56  ar=127.22  <- TRIGGER  -> REROUTE (new=242.42 < rem=242.42)
+  [STEP  1] node= 6  R=123.92  dR=1.64  ar=251.15
+  [STEP  2] node= 7  R=111.72  dR=4.40  ar=362.87
+
+  [OK] Destination 7 reached at step 2!
+
+  Pair 8 4->7 cost=362.87 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 9 (4 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 314.75  alpha=1.012  beta=3.394  rho=0.740
+  iter   25  |  best_cost = 314.75  alpha=1.012  beta=3.394  rho=0.740
+  iter   50  |  best_cost = 314.75  alpha=1.012  beta=3.394  rho=0.740
+  iter   75  |  best_cost = 314.75  alpha=1.012  beta=3.394  rho=0.740
+  iter  100  |  best_cost = 314.75  alpha=1.012  beta=3.394  rho=0.740
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.0123
+        beta  = 3.3945
+        rho   = 0.7401
+        best_cost = 314.7533
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=319.75  path: 4 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 8  R=178.99  dR=12.43  ar=178.99  <- TRIGGER  -> REROUTE (new=127.92 < rem=127.92)
+  [STEP  1] node= 9  R=125.70  dR=2.22  ar=304.69
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 9 4->9 cost=304.69 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 10 (5 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 193.09  alpha=0.722  beta=2.336  rho=0.861
+  iter   25  |  best_cost = 193.09  alpha=0.722  beta=2.336  rho=0.861
+  iter   50  |  best_cost = 193.09  alpha=0.722  beta=2.336  rho=0.861
+  iter   75  |  best_cost = 193.09  alpha=0.722  beta=2.336  rho=0.861
+  iter  100  |  best_cost = 193.09  alpha=0.722  beta=2.336  rho=0.861
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7216
+        beta  = 2.3356
+        rho   = 0.8611
+        best_cost = 193.0867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=268.33  path: 5 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 8  R=147.86  dR=7.86  ar=147.86  <- TRIGGER  -> REROUTE (new=129.70 < rem=129.70)
+  [STEP  1] node= 9  R=134.25  dR=4.55  ar=282.11
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 10 5->9 cost=282.11 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 11 (6 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 152.50  alpha=0.655  beta=1.140  rho=0.649
+  iter   25  |  best_cost = 152.50  alpha=0.655  beta=1.140  rho=0.649
+  iter   50  |  best_cost = 152.50  alpha=0.655  beta=1.140  rho=0.649
+  iter   75  |  best_cost = 152.50  alpha=0.655  beta=1.140  rho=0.649
+  iter  100  |  best_cost = 152.50  alpha=0.655  beta=1.140  rho=0.649
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6548
+        beta  = 1.1404
+        rho   = 0.6490
+        best_cost = 152.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=152.50  path: 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 9  R=164.95  dR=12.45  ar=164.95
+
+  [OK] Destination 9 reached at step 0!
+
+  Pair 11 6->9 cost=164.95 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 12 (7 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 432.50  alpha=1.030  beta=3.130  rho=0.639
+  iter   25  |  best_cost = 432.50  alpha=1.030  beta=3.130  rho=0.639
+  iter   50  |  best_cost = 432.50  alpha=1.030  beta=3.130  rho=0.639
+  iter   75  |  best_cost = 432.50  alpha=1.030  beta=3.130  rho=0.639
+  iter  100  |  best_cost = 432.50  alpha=1.030  beta=3.130  rho=0.639
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.0299
+        beta  = 3.1297
+        rho   = 0.6391
+        best_cost = 432.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=432.50  path: 7 -> 3 -> 2 -> 1 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 3  R=116.89  dR=0.61  ar=116.89
+  [STEP  1] node= 2  R=100.00  dR=0.00  ar=216.89
+  [STEP  2] node= 1  R=123.44  dR=7.59  ar=340.33  <- TRIGGER  -> keep existing (new=124.54 >= rem=124.54)
+  [STEP  3] node= 0  R=132.95  dR=8.41  ar=473.28
+
+  [OK] Destination 0 reached at step 3!
+
+  Pair 12 7->0 cost=473.28 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 13 (7 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 267.50  alpha=1.497  beta=1.636  rho=0.898
+  iter   25  |  best_cost = 267.50  alpha=1.497  beta=1.636  rho=0.898
+  iter   50  |  best_cost = 267.50  alpha=1.497  beta=1.636  rho=0.898
+  iter   75  |  best_cost = 267.50  alpha=1.497  beta=1.636  rho=0.898
+  iter  100  |  best_cost = 267.50  alpha=1.497  beta=1.636  rho=0.898
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4970
+        beta  = 1.6360
+        rho   = 0.8976
+        best_cost = 267.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=425.59  path: 7 -> 6 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=122.32  dR=7.32  ar=122.32  <- TRIGGER  -> REROUTE (new=163.16 < rem=327.94)
+  [STEP  1] node= 9  R=168.54  dR=5.38  ar=290.87
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 13 7->9 cost=290.87 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 14 (8 -> 1)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 212.50  alpha=1.280  beta=2.547  rho=0.917
+  iter   25  |  best_cost = 212.50  alpha=1.280  beta=2.547  rho=0.917
+  iter   50  |  best_cost = 212.50  alpha=1.280  beta=2.547  rho=0.917
+  iter   75  |  best_cost = 212.50  alpha=1.280  beta=2.547  rho=0.917
+  iter  100  |  best_cost = 212.50  alpha=1.280  beta=2.547  rho=0.917
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.2803
+        beta  = 2.5467
+        rho   = 0.9169
+        best_cost = 212.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=363.92  path: 8 -> 4 -> 0 -> 1
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 4  R=148.77  dR=2.35  ar=148.77
+  [STEP  1] node= 0  R=114.53  dR=6.82  ar=263.30  <- TRIGGER  -> REROUTE (new=137.52 < rem=137.52)
+  [STEP  2] node= 1  R=145.96  dR=8.44  ar=409.26
+
+  [OK] Destination 1 reached at step 2!
+
+  Pair 14 8->1 cost=409.26 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 15 (9 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 350.59  alpha=0.715  beta=2.904  rho=0.952
+  iter   25  |  best_cost = 350.59  alpha=0.715  beta=2.904  rho=0.952
+  iter   50  |  best_cost = 350.59  alpha=0.715  beta=2.904  rho=0.952
+  iter   75  |  best_cost = 350.59  alpha=0.715  beta=2.904  rho=0.952
+  iter  100  |  best_cost = 350.59  alpha=0.715  beta=2.904  rho=0.952
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7152
+        beta  = 2.9036
+        rho   = 0.9518
+        best_cost = 350.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=350.59  path: 9 -> 8 -> 4 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 8  R=102.58  dR=0.91  ar=102.58
+  [STEP  1] node= 4  R=151.44  dR=2.96  ar=254.02  <- TRIGGER  -> keep existing (new=104.00 >= rem=104.00)
+  [STEP  2] node= 0  R=101.38  dR=2.62  ar=355.40
+
+  [OK] Destination 0 reached at step 2!
+
+  Pair 15 9->0 cost=355.40 reached=YES
+
+============================================================
+  COMB-ITER 1  PAIR 16 (9 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 337.50  alpha=0.671  beta=4.786  rho=0.724
+  iter   25  |  best_cost = 337.50  alpha=0.671  beta=4.786  rho=0.724
+  iter   50  |  best_cost = 337.50  alpha=0.671  beta=4.786  rho=0.724
+  iter   75  |  best_cost = 337.50  alpha=0.671  beta=4.786  rho=0.724
+  iter  100  |  best_cost = 337.50  alpha=0.671  beta=4.786  rho=0.724
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6708
+        beta  = 4.7855
+        rho   = 0.7242
+        best_cost = 337.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=337.50  path: 9 -> 6 -> 2 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=132.64  dR=2.64  ar=132.64
+  [STEP  1] node= 2  R=121.27  dR=7.94  ar=253.90  <- TRIGGER  -> keep existing (new=100.00 >= rem=100.00)
+  [STEP  2] node= 3  R=100.00  dR=0.00  ar=353.90
+
+  [OK] Destination 3 reached at step 2!
+
+  Pair 16 9->3 cost=353.90 reached=YES
+
+  [COMBINED ITER 1] avg_cost=356.60  change=100.00%  route_changes=0  reroutes=10
+
+============================================================
+  COMBINED ITERATION 2 / 5
+============================================================
+  [COMBINED] Applied aggregate traffic from iteration 1 (weight=0.30)
+
+============================================================
+  COMB-ITER 2  PAIR 0 (0 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 426.59  alpha=1.322  beta=4.719  rho=0.570
+  iter   25  |  best_cost = 426.59  alpha=1.322  beta=4.719  rho=0.570
+  iter   50  |  best_cost = 426.59  alpha=1.322  beta=4.719  rho=0.570
+  iter   75  |  best_cost = 426.59  alpha=1.322  beta=4.719  rho=0.570
+  iter  100  |  best_cost = 426.59  alpha=1.322  beta=4.719  rho=0.570
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3223
+        beta  = 4.7195
+        rho   = 0.5702
+        best_cost = 426.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=484.25  path: 0 -> 4 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 4  R=160.21  dR=7.71  ar=160.21  <- TRIGGER  -> keep existing (new=411.90 >= rem=337.40)
+  [STEP  1] node= 8  R=200.17  dR=3.50  ar=360.38  <- TRIGGER  -> keep existing (new=142.56 >= rem=142.56)
+  [STEP  2] node= 9  R=144.83  dR=2.28  ar=505.21
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 0 0->9 cost=505.21 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 1 (0 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 491.50  alpha=1.200  beta=4.450  rho=0.989
+  iter   25  |  best_cost = 491.50  alpha=1.200  beta=4.450  rho=0.989
+  iter   50  |  best_cost = 491.50  alpha=1.200  beta=4.450  rho=0.989
+  iter   75  |  best_cost = 491.50  alpha=1.200  beta=4.450  rho=0.989
+  iter  100  |  best_cost = 491.50  alpha=1.200  beta=4.450  rho=0.989
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.2004
+        beta  = 4.4496
+        rho   = 0.9894
+        best_cost = 491.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=529.50  path: 0 -> 1 -> 2 -> 3 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=137.73  dR=16.73  ar=137.73  <- TRIGGER  -> keep existing (new=626.22 >= rem=415.51)
+  [STEP  1] node= 2  R=144.39  dR=9.57  ar=282.11  <- TRIGGER  -> keep existing (new=273.61 >= rem=273.61)
+  [STEP  2] node= 3  R=115.93  dR=4.46  ar=398.04
+  [STEP  3] node= 7  R=178.87  dR=6.30  ar=576.92
+
+  [OK] Destination 7 reached at step 3!
+
+  Pair 1 0->7 cost=576.92 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 2 (0 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 382.00  alpha=0.627  beta=4.801  rho=0.928
+  iter   25  |  best_cost = 382.00  alpha=0.627  beta=4.801  rho=0.928
+  iter   50  |  best_cost = 382.00  alpha=0.627  beta=4.801  rho=0.928
+  iter   75  |  best_cost = 382.00  alpha=0.627  beta=4.801  rho=0.928
+  iter  100  |  best_cost = 382.00  alpha=0.627  beta=4.801  rho=0.928
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6272
+        beta  = 4.8007
+        rho   = 0.9282
+        best_cost = 382.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=382.00  path: 0 -> 1 -> 2 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=143.34  dR=22.34  ar=143.34  <- TRIGGER  -> keep existing (new=271.86 >= rem=271.86)
+  [STEP  1] node= 2  R=164.92  dR=2.93  ar=308.27  <- TRIGGER  -> keep existing (new=115.26 >= rem=115.26)
+  [STEP  2] node= 3  R=118.56  dR=3.30  ar=426.82
+
+  [OK] Destination 3 reached at step 2!
+
+  Pair 2 0->3 cost=426.82 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 3 (1 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 252.50  alpha=0.989  beta=3.275  rho=0.795
+  iter   25  |  best_cost = 252.50  alpha=0.989  beta=3.275  rho=0.795
+  iter   50  |  best_cost = 252.50  alpha=0.989  beta=3.275  rho=0.795
+  iter   75  |  best_cost = 252.50  alpha=0.989  beta=3.275  rho=0.795
+  iter  100  |  best_cost = 252.50  alpha=0.989  beta=3.275  rho=0.795
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.9892
+        beta  = 3.2748
+        rho   = 0.7945
+        best_cost = 252.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=252.50  path: 1 -> 5 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=123.64  dR=11.14  ar=123.64  <- TRIGGER  -> keep existing (new=288.36 >= rem=151.05)
+  [STEP  1] node= 8  R=160.17  dR=9.12  ar=283.82
+
+  [OK] Destination 8 reached at step 1!
+
+  Pair 3 1->8 cost=283.82 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 4 (1 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 305.59  alpha=0.628  beta=4.282  rho=0.875
+  iter   25  |  best_cost = 305.59  alpha=0.628  beta=4.282  rho=0.875
+  iter   50  |  best_cost = 305.59  alpha=0.628  beta=4.282  rho=0.875
+  iter   75  |  best_cost = 305.59  alpha=0.628  beta=4.282  rho=0.875
+  iter  100  |  best_cost = 305.59  alpha=0.628  beta=4.282  rho=0.875
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6281
+        beta  = 4.2816
+        rho   = 0.8752
+        best_cost = 305.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=392.83  path: 1 -> 5 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=119.33  dR=6.83  ar=119.33  <- TRIGGER  -> keep existing (new=290.87 >= rem=290.87)
+  [STEP  1] node= 8  R=155.18  dR=5.49  ar=274.51  <- TRIGGER  -> REROUTE (new=142.28 < rem=142.28)
+  [STEP  2] node= 9  R=146.69  dR=4.41  ar=421.20
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 4 1->9 cost=421.20 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 5 (2 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 362.50  alpha=1.232  beta=3.384  rho=0.734
+  iter   25  |  best_cost = 362.50  alpha=1.232  beta=3.384  rho=0.734
+  iter   50  |  best_cost = 362.50  alpha=1.232  beta=3.384  rho=0.734
+  iter   75  |  best_cost = 362.50  alpha=1.232  beta=3.384  rho=0.734
+  iter  100  |  best_cost = 362.50  alpha=1.232  beta=3.384  rho=0.734
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.2318
+        beta  = 3.3836
+        rho   = 0.7339
+        best_cost = 362.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=377.50  path: 2 -> 6 -> 5 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=122.06  dR=2.06  ar=122.06
+  [STEP  1] node= 5  R=121.53  dR=1.47  ar=243.59
+  [STEP  2] node= 8  R=157.07  dR=6.02  ar=400.67
+
+  [OK] Destination 8 reached at step 2!
+
+  Pair 5 2->8 cost=400.67 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 6 (2 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 290.50  alpha=0.601  beta=3.509  rho=0.705
+  iter   25  |  best_cost = 290.50  alpha=0.601  beta=3.509  rho=0.705
+  iter   50  |  best_cost = 290.50  alpha=0.601  beta=3.509  rho=0.705
+  iter   75  |  best_cost = 290.50  alpha=0.601  beta=3.509  rho=0.705
+  iter  100  |  best_cost = 290.50  alpha=0.601  beta=3.509  rho=0.705
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6009
+        beta  = 3.5094
+        rho   = 0.7048
+        best_cost = 290.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=290.50  path: 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=134.74  dR=14.74  ar=134.74  <- TRIGGER  -> REROUTE (new=184.28 < rem=184.28)
+  [STEP  1] node= 9  R=203.37  dR=19.08  ar=338.10
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 6 2->9 cost=338.10 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 7 (3 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 396.50  alpha=0.735  beta=3.018  rho=0.832
+  iter   25  |  best_cost = 396.50  alpha=0.735  beta=3.018  rho=0.832
+  iter   50  |  best_cost = 396.50  alpha=0.735  beta=3.018  rho=0.832
+  iter   75  |  best_cost = 396.50  alpha=0.735  beta=3.018  rho=0.832
+  iter  100  |  best_cost = 396.50  alpha=0.735  beta=3.018  rho=0.832
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7355
+        beta  = 3.0179
+        rho   = 0.8317
+        best_cost = 396.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=396.50  path: 3 -> 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 2  R=109.74  dR=3.74  ar=109.74
+  [STEP  1] node= 6  R=126.73  dR=4.18  ar=236.47
+  [STEP  2] node= 9  R=221.93  dR=21.53  ar=458.40
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 7 3->9 cost=458.40 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 8 (4 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 379.67  alpha=0.717  beta=3.420  rho=0.993
+  iter   25  |  best_cost = 379.67  alpha=0.717  beta=3.420  rho=0.993
+  iter   50  |  best_cost = 379.67  alpha=0.717  beta=3.420  rho=0.993
+  iter   75  |  best_cost = 379.67  alpha=0.717  beta=3.420  rho=0.993
+  iter  100  |  best_cost = 379.67  alpha=0.717  beta=3.420  rho=0.993
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7170
+        beta  = 3.4205
+        rho   = 0.9935
+        best_cost = 379.6667
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=594.00  path: 4 -> 0 -> 1 -> 5 -> 6 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 0  R=104.44  dR=1.94  ar=104.44
+  [STEP  1] node= 1  R=163.63  dR=14.25  ar=268.07  <- TRIGGER  -> keep existing (new=455.10 >= rem=369.70)
+  [STEP  2] node= 5  R=129.29  dR=5.46  ar=397.37  <- TRIGGER  -> keep existing (new=238.17 >= rem=238.17)
+  [STEP  3] node= 6  R=117.38  dR=4.73  ar=514.74
+  [STEP  4] node= 7  R=111.40  dR=2.79  ar=626.14
+
+  [OK] Destination 7 reached at step 4!
+
+  Pair 8 4->7 cost=626.14 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 9 (4 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 314.75  alpha=0.546  beta=1.534  rho=0.520
+  iter   25  |  best_cost = 314.75  alpha=0.546  beta=1.534  rho=0.520
+  iter   50  |  best_cost = 314.75  alpha=0.546  beta=1.534  rho=0.520
+  iter   75  |  best_cost = 314.75  alpha=0.546  beta=1.534  rho=0.520
+  iter  100  |  best_cost = 314.75  alpha=0.546  beta=1.534  rho=0.520
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.5455
+        beta  = 1.5343
+        rho   = 0.5197
+        best_cost = 314.7533
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=314.75  path: 4 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=130.93  dR=9.27  ar=130.93  <- TRIGGER  -> REROUTE (new=202.21 < rem=202.21)
+  [STEP  1] node= 9  R=199.43  dR=2.77  ar=330.37
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 9 4->9 cost=330.37 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 10 (5 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 193.09  alpha=1.451  beta=2.709  rho=0.800
+  iter   25  |  best_cost = 193.09  alpha=1.451  beta=2.709  rho=0.800
+  iter   50  |  best_cost = 193.09  alpha=1.451  beta=2.709  rho=0.800
+  iter   75  |  best_cost = 193.09  alpha=1.451  beta=2.709  rho=0.800
+  iter  100  |  best_cost = 193.09  alpha=1.451  beta=2.709  rho=0.800
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4505
+        beta  = 2.7092
+        rho   = 0.8004
+        best_cost = 193.0867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=280.33  path: 5 -> 8 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 8  R=150.95  dR=10.95  ar=150.95  <- TRIGGER  -> REROUTE (new=143.43 < rem=143.43)
+  [STEP  1] node= 9  R=151.07  dR=7.64  ar=302.01
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 10 5->9 cost=302.01 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 11 (6 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 170.50  alpha=1.106  beta=1.039  rho=0.922
+  iter   25  |  best_cost = 170.50  alpha=1.106  beta=1.039  rho=0.922
+  iter   50  |  best_cost = 170.50  alpha=1.106  beta=1.039  rho=0.922
+  iter   75  |  best_cost = 170.50  alpha=1.106  beta=1.039  rho=0.922
+  iter  100  |  best_cost = 170.50  alpha=1.106  beta=1.039  rho=0.922
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.1065
+        beta  = 1.0392
+        rho   = 0.9225
+        best_cost = 170.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=170.50  path: 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 9  R=171.75  dR=1.25  ar=171.75
+
+  [OK] Destination 9 reached at step 0!
+
+  Pair 11 6->9 cost=171.75 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 12 (7 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 435.00  alpha=1.376  beta=3.730  rho=0.929
+  iter   25  |  best_cost = 435.00  alpha=1.376  beta=3.730  rho=0.929
+  iter   50  |  best_cost = 435.00  alpha=1.376  beta=3.730  rho=0.929
+  iter   75  |  best_cost = 435.00  alpha=1.376  beta=3.730  rho=0.929
+  iter  100  |  best_cost = 435.00  alpha=1.376  beta=3.730  rho=0.929
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3758
+        beta  = 3.7296
+        rho   = 0.9288
+        best_cost = 435.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=435.00  path: 7 -> 6 -> 5 -> 4 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=118.57  dR=3.57  ar=118.57
+  [STEP  1] node= 5  R=122.78  dR=2.45  ar=241.35
+  [STEP  2] node= 4  R=100.00  dR=0.00  ar=341.35
+  [STEP  3] node= 0  R=119.98  dR=5.22  ar=461.33
+
+  [OK] Destination 0 reached at step 3!
+
+  Pair 12 7->0 cost=461.33 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 13 (7 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 285.50  alpha=1.453  beta=1.281  rho=0.533
+  iter   25  |  best_cost = 285.50  alpha=1.453  beta=1.281  rho=0.533
+  iter   50  |  best_cost = 285.50  alpha=1.453  beta=1.281  rho=0.533
+  iter   75  |  best_cost = 285.50  alpha=1.453  beta=1.281  rho=0.533
+  iter  100  |  best_cost = 285.50  alpha=1.453  beta=1.281  rho=0.533
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4530
+        beta  = 1.2806
+        rho   = 0.5334
+        best_cost = 285.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=285.50  path: 7 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=117.73  dR=2.73  ar=117.73
+  [STEP  1] node= 9  R=211.30  dR=19.23  ar=329.03
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 13 7->9 cost=329.03 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 14 (8 -> 1)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 212.50  alpha=1.310  beta=1.676  rho=0.951
+  iter   25  |  best_cost = 212.50  alpha=1.310  beta=1.676  rho=0.951
+  iter   50  |  best_cost = 212.50  alpha=1.310  beta=1.676  rho=0.951
+  iter   75  |  best_cost = 212.50  alpha=1.310  beta=1.676  rho=0.951
+  iter  100  |  best_cost = 212.50  alpha=1.310  beta=1.676  rho=0.951
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3104
+        beta  = 1.6762
+        rho   = 0.9511
+        best_cost = 212.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=212.50  path: 8 -> 5 -> 1
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=113.48  dR=3.48  ar=113.48
+  [STEP  1] node= 1  R=104.68  dR=1.93  ar=218.16
+
+  [OK] Destination 1 reached at step 1!
+
+  Pair 14 8->1 cost=218.16 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 15 (9 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 354.59  alpha=1.203  beta=3.499  rho=0.930
+  iter   25  |  best_cost = 354.59  alpha=1.203  beta=3.499  rho=0.930
+  iter   50  |  best_cost = 354.59  alpha=1.203  beta=3.499  rho=0.930
+  iter   75  |  best_cost = 354.59  alpha=1.203  beta=3.499  rho=0.930
+  iter  100  |  best_cost = 354.59  alpha=1.203  beta=3.499  rho=0.930
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.2029
+        beta  = 3.4992
+        rho   = 0.9300
+        best_cost = 354.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=354.59  path: 9 -> 8 -> 4 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 8  R=107.88  dR=2.21  ar=107.88
+  [STEP  1] node= 4  R=149.33  dR=1.47  ar=257.21
+  [STEP  2] node= 0  R=113.85  dR=4.18  ar=371.06
+
+  [OK] Destination 0 reached at step 2!
+
+  Pair 15 9->0 cost=371.06 reached=YES
+
+============================================================
+  COMB-ITER 2  PAIR 16 (9 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 343.50  alpha=0.744  beta=3.757  rho=0.783
+  iter   25  |  best_cost = 343.50  alpha=0.744  beta=3.757  rho=0.783
+  iter   50  |  best_cost = 343.50  alpha=0.744  beta=3.757  rho=0.783
+  iter   75  |  best_cost = 343.50  alpha=0.744  beta=3.757  rho=0.783
+  iter  100  |  best_cost = 343.50  alpha=0.744  beta=3.757  rho=0.783
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7436
+        beta  = 3.7568
+        rho   = 0.7834
+        best_cost = 343.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=343.50  path: 9 -> 6 -> 2 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=135.12  dR=5.12  ar=135.12  <- TRIGGER  -> keep existing (new=219.13 >= rem=219.13)
+  [STEP  1] node= 2  R=113.84  dR=3.29  ar=248.96
+  [STEP  2] node= 3  R=116.35  dR=4.46  ar=365.30
+
+  [OK] Destination 3 reached at step 2!
+
+  Pair 16 9->3 cost=365.30 reached=YES
+
+  [COMBINED ITER 2] avg_cost=387.43  change=8.64%  route_changes=7  reroutes=4
+
+============================================================
+  COMBINED ITERATION 3 / 5
+============================================================
+  [COMBINED] Applied aggregate traffic from iteration 2 (weight=0.30)
+
+============================================================
+  COMB-ITER 3  PAIR 0 (0 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 437.09  alpha=0.871  beta=1.417  rho=0.653
+  iter   25  |  best_cost = 437.09  alpha=0.871  beta=1.417  rho=0.653
+  iter   50  |  best_cost = 437.09  alpha=0.871  beta=1.417  rho=0.653
+  iter   75  |  best_cost = 437.09  alpha=0.871  beta=1.417  rho=0.653
+  iter  100  |  best_cost = 437.09  alpha=0.871  beta=1.417  rho=0.653
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.8714
+        beta  = 1.4169
+        rho   = 0.6529
+        best_cost = 437.0867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=437.09  path: 0 -> 1 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=158.39  dR=31.39  ar=158.39  <- TRIGGER  -> REROUTE (new=320.84 < rem=320.84)
+  [STEP  1] node= 5  R=137.69  dR=11.84  ar=296.08  <- TRIGGER  -> keep existing (new=206.23 >= rem=206.23)
+  [STEP  2] node= 9  R=217.85  dR=11.62  ar=513.94
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 0 0->9 cost=513.94 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 1 (0 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 491.50  alpha=0.601  beta=4.184  rho=0.829
+  iter   25  |  best_cost = 491.50  alpha=0.601  beta=4.184  rho=0.829
+  iter   50  |  best_cost = 491.50  alpha=0.601  beta=4.184  rho=0.829
+  iter   75  |  best_cost = 491.50  alpha=0.601  beta=4.184  rho=0.829
+  iter  100  |  best_cost = 491.50  alpha=0.601  beta=4.184  rho=0.829
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6013
+        beta  = 4.1844
+        rho   = 0.8293
+        best_cost = 491.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=491.50  path: 0 -> 1 -> 5 -> 6 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=144.45  dR=17.45  ar=144.45  <- TRIGGER  -> keep existing (new=370.16 >= rem=370.16)
+  [STEP  1] node= 5  R=132.81  dR=6.58  ar=277.25  <- TRIGGER  -> keep existing (new=522.12 >= rem=240.17)
+  [STEP  2] node= 6  R=122.46  dR=0.59  ar=399.71
+  [STEP  3] node= 7  R=109.35  dR=4.46  ar=509.05
+
+  [OK] Destination 7 reached at step 3!
+
+  Pair 1 0->7 cost=509.05 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 2 (0 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 400.00  alpha=0.767  beta=2.546  rho=0.801
+  iter   25  |  best_cost = 400.00  alpha=0.767  beta=2.546  rho=0.801
+  iter   50  |  best_cost = 400.00  alpha=0.767  beta=2.546  rho=0.801
+  iter   75  |  best_cost = 400.00  alpha=0.767  beta=2.546  rho=0.801
+  iter  100  |  best_cost = 400.00  alpha=0.767  beta=2.546  rho=0.801
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.7674
+        beta  = 2.5464
+        rho   = 0.8010
+        best_cost = 400.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=400.00  path: 0 -> 1 -> 2 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 1  R=150.95  dR=23.95  ar=150.95  <- TRIGGER  -> REROUTE (new=282.46 < rem=282.46)
+  [STEP  1] node= 2  R=172.45  dR=6.51  ar=323.39  <- TRIGGER  -> REROUTE (new=119.44 < rem=119.44)
+  [STEP  2] node= 3  R=122.29  dR=2.85  ar=445.68
+
+  [OK] Destination 3 reached at step 2!
+
+  Pair 2 0->3 cost=445.68 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 3 (1 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 261.50  alpha=1.378  beta=2.186  rho=0.981
+  iter   25  |  best_cost = 261.50  alpha=1.378  beta=2.186  rho=0.981
+  iter   50  |  best_cost = 261.50  alpha=1.378  beta=2.186  rho=0.981
+  iter   75  |  best_cost = 261.50  alpha=1.378  beta=2.186  rho=0.981
+  iter  100  |  best_cost = 261.50  alpha=1.378  beta=2.186  rho=0.981
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3784
+        beta  = 2.1864
+        rho   = 0.9811
+        best_cost = 261.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=448.92  path: 1 -> 0 -> 4 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 0  R=107.62  dR=2.62  ar=107.62
+  [STEP  1] node= 4  R=173.98  dR=10.37  ar=281.60  <- TRIGGER  -> keep existing (new=180.78 >= rem=180.78)
+  [STEP  2] node= 8  R=165.00  dR=15.78  ar=446.60
+
+  [OK] Destination 8 reached at step 2!
+
+  Pair 3 1->8 cost=446.60 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 4 (1 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 310.09  alpha=0.687  beta=2.409  rho=0.803
+  iter   25  |  best_cost = 310.09  alpha=0.687  beta=2.409  rho=0.803
+  iter   50  |  best_cost = 310.09  alpha=0.687  beta=2.409  rho=0.803
+  iter   75  |  best_cost = 310.09  alpha=0.687  beta=2.409  rho=0.803
+  iter  100  |  best_cost = 310.09  alpha=0.687  beta=2.409  rho=0.803
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6866
+        beta  = 2.4089
+        rho   = 0.8032
+        best_cost = 310.0867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=310.09  path: 1 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=130.09  dR=13.09  ar=130.09  <- TRIGGER  -> keep existing (new=208.05 >= rem=208.05)
+  [STEP  1] node= 9  R=230.73  dR=22.68  ar=360.82
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 4 1->9 cost=360.82 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 5 (2 -> 8)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 371.50  alpha=1.242  beta=4.502  rho=0.714
+  iter   25  |  best_cost = 371.50  alpha=1.242  beta=4.502  rho=0.714
+  iter   50  |  best_cost = 371.50  alpha=1.242  beta=4.502  rho=0.714
+  iter   75  |  best_cost = 371.50  alpha=1.242  beta=4.502  rho=0.714
+  iter  100  |  best_cost = 371.50  alpha=1.242  beta=4.502  rho=0.714
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.2416
+        beta  = 4.5018
+        rho   = 0.7139
+        best_cost = 371.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=391.00  path: 2 -> 6 -> 5 -> 8
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=132.14  dR=7.64  ar=132.14  <- TRIGGER  -> keep existing (new=666.56 >= rem=282.02)
+  [STEP  1] node= 5  R=131.33  dR=4.49  ar=263.47
+  [STEP  2] node= 8  R=172.23  dR=7.99  ar=435.70
+
+  [OK] Destination 8 reached at step 2!
+
+  Pair 5 2->8 cost=435.70 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 6 (2 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 290.50  alpha=1.045  beta=1.123  rho=0.701
+  iter   25  |  best_cost = 290.50  alpha=1.045  beta=1.123  rho=0.701
+  iter   50  |  best_cost = 290.50  alpha=1.045  beta=1.123  rho=0.701
+  iter   75  |  best_cost = 290.50  alpha=1.045  beta=1.123  rho=0.701
+  iter  100  |  best_cost = 290.50  alpha=1.045  beta=1.123  rho=0.701
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.0449
+        beta  = 1.1232
+        rho   = 0.7011
+        best_cost = 290.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=290.50  path: 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=136.91  dR=12.41  ar=136.91  <- TRIGGER  -> keep existing (new=168.56 >= rem=168.56)
+  [STEP  1] node= 9  R=172.65  dR=4.09  ar=309.56
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 6 2->9 cost=309.56 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 7 (3 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 390.50  alpha=0.986  beta=1.784  rho=0.803
+  iter   25  |  best_cost = 390.50  alpha=0.986  beta=1.784  rho=0.803
+  iter   50  |  best_cost = 390.50  alpha=0.986  beta=1.784  rho=0.803
+  iter   75  |  best_cost = 390.50  alpha=0.986  beta=1.784  rho=0.803
+  iter  100  |  best_cost = 390.50  alpha=0.986  beta=1.784  rho=0.803
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.9857
+        beta  = 1.7840
+        rho   = 0.8029
+        best_cost = 390.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=390.50  path: 3 -> 2 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 2  R=100.00  dR=0.00  ar=100.00
+  [STEP  1] node= 6  R=150.41  dR=15.26  ar=250.41  <- TRIGGER  -> REROUTE (new=181.61 < rem=181.61)
+  [STEP  2] node= 9  R=182.50  dR=0.89  ar=432.91
+
+  [OK] Destination 9 reached at step 2!
+
+  Pair 7 3->9 cost=432.91 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 8 (4 -> 7)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 369.17  alpha=0.912  beta=1.958  rho=0.790
+  iter   25  |  best_cost = 369.17  alpha=0.912  beta=1.958  rho=0.790
+  iter   50  |  best_cost = 369.17  alpha=0.912  beta=1.958  rho=0.790
+  iter   75  |  best_cost = 369.17  alpha=0.912  beta=1.958  rho=0.790
+  iter  100  |  best_cost = 369.17  alpha=0.912  beta=1.958  rho=0.790
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.9124
+        beta  = 1.9577
+        rho   = 0.7902
+        best_cost = 369.1667
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=369.17  path: 4 -> 5 -> 6 -> 7
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=128.04  dR=6.37  ar=128.04  <- TRIGGER  -> REROUTE (new=242.75 < rem=242.75)
+  [STEP  1] node= 6  R=124.43  dR=0.26  ar=252.47
+  [STEP  2] node= 7  R=111.65  dR=2.65  ar=364.12
+
+  [OK] Destination 7 reached at step 2!
+
+  Pair 8 4->7 cost=364.12 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 9 (4 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 314.75  alpha=1.412  beta=1.483  rho=0.697
+  iter   25  |  best_cost = 314.75  alpha=1.412  beta=1.483  rho=0.697
+  iter   50  |  best_cost = 314.75  alpha=1.412  beta=1.483  rho=0.697
+  iter   75  |  best_cost = 314.75  alpha=1.412  beta=1.483  rho=0.697
+  iter  100  |  best_cost = 314.75  alpha=1.412  beta=1.483  rho=0.697
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.4116
+        beta  = 1.4834
+        rho   = 0.6969
+        best_cost = 314.7533
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=314.75  path: 4 -> 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=132.44  dR=10.77  ar=132.44  <- TRIGGER  -> keep existing (new=216.89 >= rem=216.89)
+  [STEP  1] node= 9  R=235.69  dR=18.79  ar=368.13
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 9 4->9 cost=368.13 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 10 (5 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 193.09  alpha=0.607  beta=2.934  rho=0.660
+  iter   25  |  best_cost = 193.09  alpha=0.607  beta=2.934  rho=0.660
+  iter   50  |  best_cost = 193.09  alpha=0.607  beta=2.934  rho=0.660
+  iter   75  |  best_cost = 193.09  alpha=0.607  beta=2.934  rho=0.660
+  iter  100  |  best_cost = 193.09  alpha=0.607  beta=2.934  rho=0.660
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6072
+        beta  = 2.9338
+        rho   = 0.6597
+        best_cost = 193.0867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=193.09  path: 5 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 9  R=203.24  dR=10.15  ar=203.24
+
+  [OK] Destination 9 reached at step 0!
+
+  Pair 10 5->9 cost=203.24 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 11 (6 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 166.00  alpha=0.633  beta=2.260  rho=0.583
+  iter   25  |  best_cost = 166.00  alpha=0.633  beta=2.260  rho=0.583
+  iter   50  |  best_cost = 166.00  alpha=0.633  beta=2.260  rho=0.583
+  iter   75  |  best_cost = 166.00  alpha=0.633  beta=2.260  rho=0.583
+  iter  100  |  best_cost = 166.00  alpha=0.633  beta=2.260  rho=0.583
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6332
+        beta  = 2.2600
+        rho   = 0.5833
+        best_cost = 166.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=166.00  path: 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 9  R=184.92  dR=18.92  ar=184.92
+
+  [OK] Destination 9 reached at step 0!
+
+  Pair 11 6->9 cost=184.92 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 12 (7 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 432.50  alpha=1.316  beta=3.975  rho=0.556
+  iter   25  |  best_cost = 432.50  alpha=1.316  beta=3.975  rho=0.556
+  iter   50  |  best_cost = 432.50  alpha=1.316  beta=3.975  rho=0.556
+  iter   75  |  best_cost = 432.50  alpha=1.316  beta=3.975  rho=0.556
+  iter  100  |  best_cost = 432.50  alpha=1.316  beta=3.975  rho=0.556
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3160
+        beta  = 3.9752
+        rho   = 0.5557
+        best_cost = 432.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=432.50  path: 7 -> 3 -> 2 -> 1 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 3  R=117.94  dR=0.44  ar=117.94
+  [STEP  1] node= 2  R=100.00  dR=0.00  ar=217.94
+  [STEP  2] node= 1  R=129.38  dR=5.82  ar=347.32  <- TRIGGER  -> REROUTE (new=114.53 < rem=114.53)
+  [STEP  3] node= 0  R=116.80  dR=2.27  ar=464.12
+
+  [OK] Destination 0 reached at step 3!
+
+  Pair 12 7->0 cost=464.12 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 13 (7 -> 9)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 287.00  alpha=1.284  beta=1.011  rho=0.706
+  iter   25  |  best_cost = 287.00  alpha=1.284  beta=1.011  rho=0.706
+  iter   50  |  best_cost = 287.00  alpha=1.284  beta=1.011  rho=0.706
+  iter   75  |  best_cost = 287.00  alpha=1.284  beta=1.011  rho=0.706
+  iter  100  |  best_cost = 287.00  alpha=1.284  beta=1.011  rho=0.706
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.2843
+        beta  = 1.0112
+        rho   = 0.7061
+        best_cost = 287.0000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=287.00  path: 7 -> 6 -> 9
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=131.96  dR=10.96  ar=131.96  <- TRIGGER  -> keep existing (new=165.87 >= rem=165.87)
+  [STEP  1] node= 9  R=170.05  dR=4.18  ar=302.02
+
+  [OK] Destination 9 reached at step 1!
+
+  Pair 13 7->9 cost=302.02 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 14 (8 -> 1)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 212.50  alpha=0.942  beta=3.167  rho=0.984
+  iter   25  |  best_cost = 212.50  alpha=0.942  beta=3.167  rho=0.984
+  iter   50  |  best_cost = 212.50  alpha=0.942  beta=3.167  rho=0.984
+  iter   75  |  best_cost = 212.50  alpha=0.942  beta=3.167  rho=0.984
+  iter  100  |  best_cost = 212.50  alpha=0.942  beta=3.167  rho=0.984
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.9422
+        beta  = 3.1666
+        rho   = 0.9839
+        best_cost = 212.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=212.50  path: 8 -> 5 -> 1
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 5  R=113.44  dR=3.44  ar=113.44
+  [STEP  1] node= 1  R=101.22  dR=0.49  ar=214.65
+
+  [OK] Destination 1 reached at step 1!
+
+  Pair 14 8->1 cost=214.65 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 15 (9 -> 0)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 359.59  alpha=0.677  beta=1.090  rho=0.580
+  iter   25  |  best_cost = 359.59  alpha=0.677  beta=1.090  rho=0.580
+  iter   50  |  best_cost = 359.59  alpha=0.677  beta=1.090  rho=0.580
+  iter   75  |  best_cost = 359.59  alpha=0.677  beta=1.090  rho=0.580
+  iter  100  |  best_cost = 359.59  alpha=0.677  beta=1.090  rho=0.580
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 0.6766
+        beta  = 1.0897
+        rho   = 0.5797
+        best_cost = 359.5867
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=359.59  path: 9 -> 8 -> 4 -> 0
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 8  R=102.56  dR=0.89  ar=102.56
+  [STEP  1] node= 4  R=151.89  dR=2.63  ar=254.45  <- TRIGGER  -> REROUTE (new=122.90 < rem=122.90)
+  [STEP  2] node= 0  R=126.52  dR=3.62  ar=380.97
+
+  [OK] Destination 0 reached at step 2!
+
+  Pair 15 9->0 cost=380.97 reached=YES
+
+============================================================
+  COMB-ITER 3  PAIR 16 (9 -> 3)
+============================================================
+
+  --- PHASE 1: PSO Parameter Optimisation ---
+
+[PSO] Tuning ACO parameters over 100 iterations ...
+  iter    1  |  best_cost = 349.50  alpha=1.374  beta=1.215  rho=0.617
+  iter   25  |  best_cost = 349.50  alpha=1.374  beta=1.215  rho=0.617
+  iter   50  |  best_cost = 349.50  alpha=1.374  beta=1.215  rho=0.617
+  iter   75  |  best_cost = 349.50  alpha=1.374  beta=1.215  rho=0.617
+  iter  100  |  best_cost = 349.50  alpha=1.374  beta=1.215  rho=0.617
+
+  [PSO] Optimal ACO parameters found:
+        alpha = 1.3737
+        beta  = 1.2152
+        rho   = 0.6174
+        best_cost = 349.5000
+
+  --- PHASE 2: Initial ACO Path Planning ---
+
+  [ACO] Initial best path found:
+  besttour | cost=372.50  path: 9 -> 6 -> 7 -> 3
+
+  --- PHASE 3: Dynamic Simulation & Re-planning ---
+  Simulating 20 time steps ...
+
+  [STEP  0] node= 6  R=129.02  dR=0.98  ar=129.02
+  [STEP  1] node= 7  R=112.84  dR=6.88  ar=241.86  <- TRIGGER  -> keep existing (new=118.46 >= rem=118.46)
+  [STEP  2] node= 3  R=118.59  dR=0.12  ar=360.44
+
+  [OK] Destination 3 reached at step 2!
+
+  Pair 16 9->3 cost=360.44 reached=YES
+
+  [COMBINED ITER 3] avg_cost=370.40  change=4.39%  route_changes=13  reroutes=7
+
+  ** STABILIZED at iteration 3 (change 4.39% < threshold 5.00%) **
+
+============================================================
+  COMBINED OPTIMIZATION SUMMARY (Final Iteration)
+============================================================
+
+   Pair   Src   Dst   InitCost  FinalCost Reroutes  Reached  Final Path
+  --------------------------------------------------------------------------------
+      0     0     9     437.09     513.94        1      YES  1->5->9
+      1     0     7     491.50     509.05        0      YES  0->1->5->6->7
+      2     0     3     400.00     445.68        2      YES  2->3
+      3     1     8     448.92     446.60        0      YES  1->0->4->8
+      4     1     9     310.09     360.82        0      YES  1->5->9
+      5     2     8     391.00     435.70        0      YES  2->6->5->8
+      6     2     9     290.50     309.56        0      YES  2->6->9
+      7     3     9     390.50     432.91        1      YES  6->9
+      8     4     7     369.17     364.12        1      YES  5->6->7
+      9     4     9     314.75     368.13        0      YES  4->5->9
+     10     5     9     193.09     203.24        0      YES  5->9
+     11     6     9     166.00     184.92        0      YES  6->9
+     12     7     0     432.50     464.12        1      YES  1->0
+     13     7     9     287.00     302.02        0      YES  7->6->9
+     14     8     1     212.50     214.65        0      YES  8->5->1
+     15     9     0     359.59     380.97        1      YES  4->0
+     16     9     3     372.50     360.44        0      YES  9->6->7->3
+
+  Total pairs    : 17
+  Reached dest.  : 17 / 17
+  Total reroutes : 7
+  Avg final cost : 370.40
+
+  Results saved -> combined_pairs_results.csv
+  Network analysis saved -> network_analysis_combined.txt
+  Comparison report saved -> combined_comparison.txt
+
+  Reroute log (independent) -> reroute_log.txt
+  Results CSV (independent) -> all_pairs_results.csv
+  Network analysis          -> network_analysis.txt
+  Results CSV (combined)    -> combined_pairs_results.csv
+  Network analysis (comb.)  -> network_analysis_combined.txt
+  Comparison report         -> combined_comparison.txt
+
+============================================================
+  Done. All source-destination pairs processed.
+============================================================

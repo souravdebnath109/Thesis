@@ -1,0 +1,5 @@
+intersection_id,intersection_name,latitude,longitude,type,x_coordinate,y_coordinate,district,area
+0,Shahbag,23.7389,90.3952,edge,0,0,Dhaka,Shahbag
+1,Karwan Bazar,23.75,90.3917,edge,150,100,Dhaka,Karwan Bazar
+2,Farmgate,23.7561,90.3872,non-edge,300,200,Dhaka,Farmgate
+3,Mohakhali,23.7808,90.4067,edge,450,300,Dhaka,Mohakhali

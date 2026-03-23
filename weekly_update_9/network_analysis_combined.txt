@@ -1,0 +1,129 @@
+================================================================
+  NETWORK-LEVEL ANALYSIS (Combined Route Optimization)
+================================================================
+
+1. EDGE USAGE FREQUENCY (across all successful routes)
+   (Higher frequency = potential bottleneck in combined optimization)
+
+        Edge      Freq    Used by pairs
+------------------------------------------------------------
+    6 ->  9         4    [P6,P7,P11,P13]
+    5 ->  9         4    [P0,P4,P9,P10]
+    1 ->  5         3    [P0,P1,P4]
+    6 ->  7         3    [P1,P8,P16]
+    1 ->  0         2    [P3,P12]
+    2 ->  6         2    [P5,P6]
+    5 ->  6         2    [P1,P8]
+    9 ->  6         1    [P16]
+    0 ->  1         1    [P1]
+    8 ->  5         1    [P14]
+    7 ->  6         1    [P13]
+    7 ->  3         1    [P16]
+    6 ->  5         1    [P5]
+    5 ->  8         1    [P5]
+    5 ->  1         1    [P14]
+    4 ->  8         1    [P3]
+    4 ->  5         1    [P9]
+    4 ->  0         1    [P15]
+    2 ->  3         1    [P2]
+    0 ->  4         1    [P3]
+
+2. NODE USAGE FREQUENCY (across all successful routes)
+   (Higher frequency = critical intersection in the network)
+
+    Node      Freq    Used by pairs
+------------------------------------------------------------
+      9         9    [P0,P4,P6,P7,P9,P10,P11,P13,P16]
+      5         8    [P0,P1,P4,P5,P8,P9,P10,P14]
+      6         8    [P1,P5,P6,P7,P8,P11,P13,P16]
+      1         6    [P0,P1,P3,P4,P12,P14]
+      0         4    [P1,P3,P12,P15]
+      7         4    [P1,P8,P13,P16]
+      2         3    [P2,P5,P6]
+      4         3    [P3,P9,P15]
+      8         3    [P3,P5,P14]
+      3         2    [P2,P16]
+
+3. SHARED EDGES (used by 2+ routes -- combined route overlap)
+   These edges represent the network segments where multiple S-D
+   routes overlap. In combined route optimization, these edges
+   would experience higher aggregate traffic load.
+
+   Edge 6 -> 9  shared by 4 routes: (2->9), (3->9), (6->9), (7->9)
+   Edge 5 -> 9  shared by 4 routes: (0->9), (1->9), (4->9), (5->9)
+   Edge 1 -> 5  shared by 3 routes: (0->9), (0->7), (1->9)
+   Edge 6 -> 7  shared by 3 routes: (0->7), (4->7), (9->3)
+   Edge 1 -> 0  shared by 2 routes: (1->8), (7->0)
+   Edge 2 -> 6  shared by 2 routes: (2->8), (2->9)
+   Edge 5 -> 6  shared by 2 routes: (0->7), (4->7)
+
+4. CRITICAL NODES (used by 3+ routes -- key intersections)
+
+   Node 9  used by 9 routes: (0->9), (1->9), (2->9), (3->9), (4->9), (5->9), (6->9), (7->9), (9->3)
+   Node 5  used by 8 routes: (0->9), (0->7), (1->9), (2->8), (4->7), (4->9), (5->9), (8->1)
+   Node 6  used by 8 routes: (0->7), (2->8), (2->9), (3->9), (4->7), (6->9), (7->9), (9->3)
+   Node 1  used by 6 routes: (0->9), (0->7), (1->8), (1->9), (7->0), (8->1)
+   Node 0  used by 4 routes: (0->7), (1->8), (7->0), (9->0)
+   Node 7  used by 4 routes: (0->7), (4->7), (7->9), (9->3)
+   Node 2  used by 3 routes: (0->3), (2->8), (2->9)
+   Node 4  used by 3 routes: (1->8), (4->9), (9->0)
+   Node 8  used by 3 routes: (1->8), (2->8), (8->1)
+
+5. STABILIZED ROUTE SUMMARY
+   Final routes after dynamic re-planning for all S-D pairs:
+
+ Pair     Src     Dst   Init Cost  Final Cost  Reroutes   Reached  Final Path
+----------------------------------------------------------------------------------------------------
+    0       0       9      437.09      513.94         1       YES  1->5->9
+    1       0       7      491.50      509.05         0       YES  0->1->5->6->7
+    2       0       3      400.00      445.68         2       YES  2->3
+    3       1       8      448.92      446.60         0       YES  1->0->4->8
+    4       1       9      310.09      360.82         0       YES  1->5->9
+    5       2       8      391.00      435.70         0       YES  2->6->5->8
+    6       2       9      290.50      309.56         0       YES  2->6->9
+    7       3       9      390.50      432.91         1       YES  6->9
+    8       4       7      369.17      364.12         1       YES  5->6->7
+    9       4       9      314.75      368.13         0       YES  4->5->9
+   10       5       9      193.09      203.24         0       YES  5->9
+   11       6       9      166.00      184.92         0       YES  6->9
+   12       7       0      432.50      464.12         1       YES  1->0
+   13       7       9      287.00      302.02         0       YES  7->6->9
+   14       8       1      212.50      214.65         0       YES  8->5->1
+   15       9       0      359.59      380.97         1       YES  4->0
+   16       9       3      372.50      360.44         0       YES  9->6->7->3
+----------------------------------------------------------------------------------------------------
+
+  SUMMARY STATISTICS:
+    Total S-D pairs processed : 17
+    Successfully reached      : 17 / 17
+    Total reroutes across all  : 7
+    Average final cost (succ.) : 370.40
+    Total unique edges used    : 20
+    Shared edges (2+ routes)   : 7
+    Total unique nodes used    : 10
+    Critical nodes (3+ routes) : 9
+
+6. COMBINED ROUTE OPTIMIZATION INSIGHT
+
+   In a pure independent optimization, each S-D pair is solved
+   without considering traffic from other pairs. The analysis above
+   shows which edges/nodes are over-utilized when routes are computed
+   independently.
+
+   Key observation for combined optimization:
+   - Edges with frequency >= 2 would benefit from load balancing
+   - Critical nodes (freq >= 3) are bottleneck intersections
+   - If routes were computed jointly (considering aggregate traffic),
+     some routes would shift to alternative paths to reduce
+     congestion on shared segments.
+
+   This forms the basis for iterative combined optimization:
+   1. Compute all routes independently (current approach)
+   2. Measure edge/node frequencies
+   3. Increase traffic weights on high-frequency edges
+   4. Re-optimize routes with updated weights
+   5. Repeat until route assignment stabilizes
+
+================================================================
+  End of Network Analysis
+================================================================

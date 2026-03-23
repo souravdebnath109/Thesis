@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Flowcharts — PSO-ACO Dhaka Path Planner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #58a6ff;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            margin-bottom: 50px;
+            font-size: 0.95em;
+        }
+
+        .flowchart-section {
+            margin: 60px auto;
+            max-width: 900px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 40px;
+            page-break-inside: avoid;
+        }
+
+        .flowchart-title {
+            text-align: center;
+            color: #58a6ff;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .flowchart-desc {
+            text-align: center;
+            color: #8b949e;
+            font-size: 0.85em;
+            margin-bottom: 30px;
+        }
+
+        /* ============================================================
+           SVG FLOWCHART STYLES
+           ============================================================ */
+        .flowchart-container {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        svg text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Print styles for saving */
+        @media print {
+            body { background: white; color: black; }
+            .flowchart-section { border: 2px solid #333; background: #fafafa; }
+        }
+
+        .save-hint {
+            text-align: center;
+            color: #8b949e;
+            font-size: 0.75em;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        .formula-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 20px auto;
+            max-width: 700px;
+            font-family: 'Cascadia Code', 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #79c0ff;
+            line-height: 1.8;
+        }
+
+        .formula-box .label {
+            color: #8b949e;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 12px 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .nav-bar a {
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 0.85em;
+            padding: 6px 16px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-bar a:hover {
+            background: #21262d;
+            border-color: #58a6ff;
+        }
+
+        .spacer { height: 60px; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="#fc1">1. PSO Optimization</a>
+    <a href="#fc2">2. Improved ACO</a>
+    <a href="#fc3">3. Standard ACO</a>
+    <a href="#fc4">4. Dynamic Simulation</a>
+</div>
+
+<div class="spacer"></div>
+
+<h1>🚦 Algorithm Flowcharts</h1>
+<div class="subtitle">PSO-ACO Hybrid Dynamic Path Planner for Dhaka City — Based on index.html Implementation</div>
+
+<!-- ================================================================
+     FLOWCHART 1: PSO OPTIMIZATION
+     ================================================================ -->
+<div class="flowchart-section" id="fc1">
+    <div class="flowchart-title">1️⃣ PSO Optimization (Parameter Tuning)</div>
+    <div class="flowchart-desc">Particle Swarm Optimization to find optimal α, β, ρ for ACO</div>
+
+    <div class="flowchart-container">
+        <svg width="520" height="1420" viewBox="0 0 520 1420">
+            <!-- START -->
+            <ellipse cx="260" cy="40" rx="90" ry="28" fill="#238636" stroke="#3fb950" stroke-width="2"/>
+            <text x="260" y="45" text-anchor="middle" fill="white" font-size="14" font-weight="bold">START PSO</text>
+
+            <!-- Arrow -->
+            <line x1="260" y1="68" x2="260" y2="108" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Input box -->
+            <rect x="100" y="108" width="320" height="60" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+            <text x="260" y="130" text-anchor="middle" fill="#79c0ff" font-size="11">INPUT: source, dest, nParticles, nIter</text>
+            <text x="260" y="148" text-anchor="middle" fill="#8b949e" font-size="10">graph with current traffic R_i(t) values</text>
+
+            <line x1="260" y1="168" x2="260" y2="208" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Initialize Particles -->
+            <rect x="105" y="208" width="310" height="75" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="260" y="228" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Initialize Particles</text>
+            <text x="260" y="248" text-anchor="middle" fill="#c9d1d9" font-size="10">For each particle i = 1..nParticles:</text>
+            <text x="260" y="264" text-anchor="middle" fill="#79c0ff" font-size="10">pos = [rand(α), rand(β), rand(ρ)]</text>
+            <text x="260" y="278" text-anchor="middle" fill="#79c0ff" font-size="10">vel = [rand(-1,1), rand(-1,1), rand(-0.2,0.2)]</text>
+
+            <line x1="260" y1="283" x2="260" y2="318" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Set globals -->
+            <rect x="130" y="318" width="260" height="45" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+            <text x="260" y="338" text-anchor="middle" fill="#c9d1d9" font-size="11">gBest = null</text>
+            <text x="260" y="354" text-anchor="middle" fill="#c9d1d9" font-size="11">gBestFitness = ∞</text>
+
+            <line x1="260" y1="363" x2="260" y2="398" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Loop start -->
+            <polygon points="260,398 370,428 260,458 150,428" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="260" y="432" text-anchor="middle" fill="#d29922" font-size="11" font-weight="bold">t &lt; nIter?</text>
+
+            <!-- No branch -->
+            <line x1="370" y1="428" x2="460" y2="428" stroke="#f85149" stroke-width="2"/>
+            <text x="415" y="420" fill="#f85149" font-size="10">No</text>
+            <line x1="460" y1="428" x2="460" y2="1310" stroke="#f85149" stroke-width="2"/>
+            <line x1="460" y1="1310" x2="260" y2="1310" stroke="#f85149" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Yes branch -->
+            <line x1="260" y1="458" x2="260" y2="498" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow1)"/>
+            <text x="275" y="480" fill="#3fb950" font-size="10">Yes</text>
+
+            <!-- For each particle -->
+            <rect x="100" y="498" width="320" height="40" rx="8" fill="#161b22" stroke="#f0883e" stroke-width="2"/>
+            <text x="260" y="522" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="bold">FOR each particle p:</text>
+
+            <line x1="260" y1="538" x2="260" y2="573" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Fitness evaluation -->
+            <rect x="80" y="573" width="360" height="80" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+            <text x="260" y="595" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Evaluate Fitness</text>
+            <text x="260" y="613" text-anchor="middle" fill="#c9d1d9" font-size="10">Run quick ACO with p.pos = [α, β, ρ]</text>
+            <text x="260" y="629" text-anchor="middle" fill="#79c0ff" font-size="10">fitness = bestPathCost from ACO</text>
+            <text x="260" y="645" text-anchor="middle" fill="#8b949e" font-size="9">(10 ants × 15 iterations)</text>
+
+            <line x1="260" y1="653" x2="260" y2="693" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Personal best check -->
+            <polygon points="260,693 380,723 260,753 140,723" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="260" y="720" text-anchor="middle" fill="#d29922" font-size="10">fitness &lt;</text>
+            <text x="260" y="735" text-anchor="middle" fill="#d29922" font-size="10">pBestFit?</text>
+
+            <!-- Yes -->
+            <line x1="260" y1="753" x2="260" y2="783" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow1)"/>
+            <text x="275" y="770" fill="#3fb950" font-size="10">Yes</text>
+
+            <rect x="140" y="783" width="240" height="35" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+            <text x="260" y="805" text-anchor="middle" fill="#3fb950" font-size="10">pBest = p.pos, pBestFit = fitness</text>
+
+            <line x1="260" y1="818" x2="260" y2="848" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- No bypass -->
+            <line x1="380" y1="723" x2="430" y2="723" stroke="#f85149" stroke-width="1.5"/>
+            <text x="405" y="715" fill="#f85149" font-size="9">No</text>
+            <line x1="430" y1="723" x2="430" y2="848" stroke="#f85149" stroke-width="1.5"/>
+            <line x1="430" y1="848" x2="260" y2="848" stroke="#f85149" stroke-width="1.5"/>
+
+            <!-- Global best check -->
+            <polygon points="260,848 380,878 260,908 140,878" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="260" y="875" text-anchor="middle" fill="#d29922" font-size="10">fitness &lt;</text>
+            <text x="260" y="890" text-anchor="middle" fill="#d29922" font-size="10">gBestFit?</text>
+
+            <line x1="260" y1="908" x2="260" y2="938" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow1)"/>
+            <text x="275" y="925" fill="#3fb950" font-size="10">Yes</text>
+
+            <rect x="140" y="938" width="240" height="35" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+            <text x="260" y="960" text-anchor="middle" fill="#3fb950" font-size="10">gBest = p.pos, gBestFit = fitness</text>
+
+            <line x1="260" y1="973" x2="260" y2="1013" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- No bypass -->
+            <line x1="380" y1="878" x2="430" y2="878" stroke="#f85149" stroke-width="1.5"/>
+            <line x1="430" y1="878" x2="430" y2="1013" stroke="#f85149" stroke-width="1.5"/>
+            <line x1="430" y1="1013" x2="260" y2="1013" stroke="#f85149" stroke-width="1.5"/>
+
+            <!-- Update velocity -->
+            <rect x="75" y="1013" width="370" height="85" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="260" y="1035" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Update Velocity &amp; Position</text>
+            <text x="260" y="1055" text-anchor="middle" fill="#79c0ff" font-size="9.5">v[d] = w·v[d] + c₁·r₁·(pBest[d]-pos[d])</text>
+            <text x="260" y="1070" text-anchor="middle" fill="#79c0ff" font-size="9.5">         + c₂·r₂·(gBest[d]-pos[d])</text>
+            <text x="260" y="1088" text-anchor="middle" fill="#c9d1d9" font-size="10">pos[d] += v[d]   then CLAMP to bounds</text>
+
+            <line x1="260" y1="1098" x2="260" y2="1133" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- End for -->
+            <rect x="155" y="1133" width="210" height="32" rx="6" fill="#21262d" stroke="#f0883e" stroke-width="1.5"/>
+            <text x="260" y="1153" text-anchor="middle" fill="#f0883e" font-size="11">END FOR (next particle)</text>
+
+            <line x1="260" y1="1165" x2="260" y2="1195" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Record convergence -->
+            <rect x="130" y="1195" width="260" height="35" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+            <text x="260" y="1217" text-anchor="middle" fill="#c9d1d9" font-size="10">history.push(gBestFitness); t++</text>
+
+            <!-- Loop back arrow -->
+            <line x1="260" y1="1230" x2="260" y2="1255" stroke="#58a6ff" stroke-width="2"/>
+            <line x1="260" y1="1255" x2="60" y2="1255" stroke="#d29922" stroke-width="2"/>
+            <line x1="60" y1="1255" x2="60" y2="428" stroke="#d29922" stroke-width="2"/>
+            <line x1="60" y1="428" x2="150" y2="428" stroke="#d29922" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- Output -->
+            <rect x="105" y="1310" width="310" height="55" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+            <text x="260" y="1332" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="bold">OUTPUT</text>
+            <text x="260" y="1352" text-anchor="middle" fill="#79c0ff" font-size="10">Optimized α, β, ρ + convergence history</text>
+
+            <line x1="260" y1="1365" x2="260" y2="1395" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow1)"/>
+
+            <!-- END -->
+            <ellipse cx="260" cy="1400" rx="60" ry="20" fill="#da3633" stroke="#f85149" stroke-width="2"/>
+            <text x="260" y="1405" text-anchor="middle" fill="white" font-size="12" font-weight="bold">END</text>
+
+            <!-- Arrow marker -->
+            <defs>
+                <marker id="arrow1" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/>
+                </marker>
+            </defs>
+        </svg>
+    </div>
+
+    <div class="formula-box">
+        <div class="label">Key Formulas Used (from code — PSOOptimizer class):</div>
+        v[d] = 0.72 × v[d] + 1.49 × r₁ × (pBest[d] - pos[d]) + 1.49 × r₂ × (gBest[d] - pos[d])<br>
+        pos[d] = pos[d] + v[d]<br>
+        Bounds: α ∈ [0.5, 5.0], β ∈ [0.5, 5.0], ρ ∈ [0.05, 0.95]<br>
+        fitness(α,β,ρ) = bestPathCost from ACO(10 ants, 15 iters, useRoadFactor=true)
+    </div>
+    <div class="save-hint">💡 Right-click → "Save Image As" or use Print (Ctrl+P) to save as PDF</div>
+</div>
+
+<!-- ================================================================
+     FLOWCHART 2: IMPROVED ACO
+     ================================================================ -->
+<div class="flowchart-section" id="fc2">
+    <div class="flowchart-title">2️⃣ Improved ACO (Road Condition Factor)</div>
+    <div class="flowchart-desc">Ant Colony Optimization using R_i(t) = d_i × (1 + C_i) as edge cost</div>
+
+    <div class="flowchart-container">
+        <svg width="560" height="1550" viewBox="0 0 560 1550">
+            <defs>
+                <marker id="arrow2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/>
+                </marker>
+                <marker id="arrow2r" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#f85149"/>
+                </marker>
+                <marker id="arrow2g" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#3fb950"/>
+                </marker>
+                <marker id="arrow2y" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#d29922"/>
+                </marker>
+            </defs>
+
+            <!-- START -->
+            <ellipse cx="280" cy="40" rx="110" ry="28" fill="#238636" stroke="#3fb950" stroke-width="2"/>
+            <text x="280" y="45" text-anchor="middle" fill="white" font-size="14" font-weight="bold">START IMPROVED ACO</text>
+
+            <line x1="280" y1="68" x2="280" y2="108" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Input -->
+            <rect x="100" y="108" width="360" height="65" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+            <text x="280" y="128" text-anchor="middle" fill="#79c0ff" font-size="11">INPUT: source, dest, α, β, ρ (from PSO)</text>
+            <text x="280" y="146" text-anchor="middle" fill="#8b949e" font-size="10">numAnts, maxIter, useRoadFactor = TRUE</text>
+            <text x="280" y="162" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="bold">⚡ Key difference: cost = R_i(t), not d_i</text>
+
+            <line x1="280" y1="173" x2="280" y2="213" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Update traffic -->
+            <rect x="115" y="213" width="330" height="55" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="280" y="233" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Update Traffic State</text>
+            <text x="280" y="251" text-anchor="middle" fill="#79c0ff" font-size="10">C_i(t) = vehicleCount × L / (lanes × dist)</text>
+            <text x="280" y="263" text-anchor="middle" fill="#79c0ff" font-size="10">R_i(t) = d_i × (1 + C_i(t))</text>
+
+            <line x1="280" y1="268" x2="280" y2="303" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Init pheromone -->
+            <rect x="140" y="303" width="280" height="40" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+            <text x="280" y="320" text-anchor="middle" fill="#c9d1d9" font-size="11">Initialize: τ[all edges] = 1.0</text>
+            <text x="280" y="336" text-anchor="middle" fill="#c9d1d9" font-size="11">bestPath = null, bestCost = ∞</text>
+
+            <line x1="280" y1="343" x2="280" y2="378" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Iteration loop -->
+            <polygon points="280,378 400,410 280,442 160,410" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="280" y="414" text-anchor="middle" fill="#d29922" font-size="11" font-weight="bold">iter &lt; maxIter?</text>
+
+            <!-- No -->
+            <line x1="400" y1="410" x2="500" y2="410" stroke="#f85149" stroke-width="2"/>
+            <text x="450" y="402" fill="#f85149" font-size="10">No</text>
+            <line x1="500" y1="410" x2="500" y2="1400" stroke="#f85149" stroke-width="2"/>
+            <line x1="500" y1="1400" x2="280" y2="1400" stroke="#f85149" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Yes -->
+            <line x1="280" y1="442" x2="280" y2="482" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow2)"/>
+            <text x="295" y="465" fill="#3fb950" font-size="10">Yes</text>
+
+            <!-- For each ant -->
+            <rect x="140" y="482" width="280" height="35" rx="8" fill="#161b22" stroke="#f0883e" stroke-width="2"/>
+            <text x="280" y="504" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="bold">FOR each ant k = 1..numAnts:</text>
+
+            <line x1="280" y1="517" x2="280" y2="550" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Start at source -->
+            <rect x="150" y="550" width="260" height="35" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+            <text x="280" y="572" text-anchor="middle" fill="#c9d1d9" font-size="10">current = source, visited = {source}, path = [source]</text>
+
+            <line x1="280" y1="585" x2="280" y2="618" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- While not dest -->
+            <polygon points="280,618 400,648 280,678 160,648" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="280" y="652" text-anchor="middle" fill="#d29922" font-size="10">current ≠ dest?</text>
+
+            <!-- No dest reached -->
+            <line x1="400" y1="648" x2="470" y2="648" stroke="#3fb950" stroke-width="2"/>
+            <text x="435" y="640" fill="#3fb950" font-size="9">Reached!</text>
+            <line x1="470" y1="648" x2="470" y2="960" stroke="#3fb950" stroke-width="1.5"/>
+            <line x1="470" y1="960" x2="280" y2="960" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+            <!-- Yes continue -->
+            <line x1="280" y1="678" x2="280" y2="710" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Get unvisited neighbors -->
+            <rect x="110" y="710" width="340" height="40" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+            <text x="280" y="735" text-anchor="middle" fill="#c9d1d9" font-size="10">unvisited = neighbors(current) − visited</text>
+
+            <line x1="280" y1="750" x2="280" y2="780" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Dead end check -->
+            <polygon points="280,780 390,805 280,830 170,805" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="280" y="809" text-anchor="middle" fill="#d29922" font-size="10">unvisited empty?</text>
+
+            <line x1="390" y1="805" x2="435" y2="805" stroke="#f85149" stroke-width="1.5"/>
+            <text x="410" y="797" fill="#f85149" font-size="9">Yes→Dead end</text>
+            <line x1="435" y1="805" x2="435" y2="960" stroke="#f85149" stroke-width="1.5"/>
+
+            <line x1="280" y1="830" x2="280" y2="860" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow2)"/>
+            <text x="295" y="848" fill="#3fb950" font-size="9">No</text>
+
+            <!-- Calculate probabilities -->
+            <rect x="80" y="860" width="400" height="68" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+            <text x="280" y="880" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="bold">Calculate Transition Probabilities</text>
+            <text x="280" y="898" text-anchor="middle" fill="#79c0ff" font-size="10">P(j) = [τ_ij]^α × [η_ij]^β / Σ</text>
+            <text x="280" y="916" text-anchor="middle" fill="#f0883e" font-size="10" font-weight="bold">η_ij = 1 / R_i(t)   ← uses ROAD FACTOR</text>
+
+            <line x1="280" y1="928" x2="280" y2="960" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Roulette select and move -->
+            <rect x="120" y="960" width="320" height="50" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+            <text x="280" y="980" text-anchor="middle" fill="#c9d1d9" font-size="10">next = rouletteSelect(probabilities)</text>
+            <text x="280" y="998" text-anchor="middle" fill="#c9d1d9" font-size="10">cost += R(edge), path.push(next), visited.add(next)</text>
+
+            <!-- Loop back to while -->
+            <line x1="280" y1="1010" x2="280" y2="1030" stroke="#58a6ff" stroke-width="2"/>
+            <line x1="280" y1="1030" x2="80" y2="1030" stroke="#d29922" stroke-width="1.5"/>
+            <line x1="80" y1="1030" x2="80" y2="648" stroke="#d29922" stroke-width="1.5"/>
+            <line x1="80" y1="648" x2="160" y2="648" stroke="#d29922" stroke-width="1.5" marker-end="url(#arrow2y)"/>
+
+            <!-- Update best -->
+            <line x1="280" y1="1010" x2="280" y2="1055" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <polygon points="280,1055 390,1085 280,1115 170,1085" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="280" y="1089" text-anchor="middle" fill="#d29922" font-size="10">cost &lt; bestCost?</text>
+
+            <line x1="280" y1="1115" x2="280" y2="1145" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow2)"/>
+            <rect x="140" y="1145" width="280" height="30" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+            <text x="280" y="1164" text-anchor="middle" fill="#3fb950" font-size="10">bestPath = path, bestCost = cost</text>
+
+            <line x1="280" y1="1175" x2="280" y2="1210" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Evaporation -->
+            <rect x="100" y="1210" width="360" height="55" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="280" y="1230" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Pheromone Update</text>
+            <text x="280" y="1248" text-anchor="middle" fill="#79c0ff" font-size="10">Evaporate: τ_ij = τ_ij × (1 − ρ)</text>
+            <text x="280" y="1260" text-anchor="middle" fill="#79c0ff" font-size="10">Deposit: τ_ij += Q / antCost (for each ant's path)</text>
+
+            <line x1="280" y1="1265" x2="280" y2="1298" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <!-- Elitist -->
+            <rect x="110" y="1298" width="340" height="45" rx="8" fill="#0d1117" stroke="#f0883e" stroke-width="2"/>
+            <text x="280" y="1315" text-anchor="middle" fill="#f0883e" font-size="11" font-weight="bold">Elitist Deposit (Extra)</text>
+            <text x="280" y="1333" text-anchor="middle" fill="#79c0ff" font-size="10">τ_ij += (Q/bestCost) × 2  on bestPath edges</text>
+
+            <!-- Loop back -->
+            <line x1="280" y1="1343" x2="280" y2="1365" stroke="#58a6ff" stroke-width="2"/>
+            <line x1="280" y1="1365" x2="55" y2="1365" stroke="#d29922" stroke-width="2"/>
+            <line x1="55" y1="1365" x2="55" y2="410" stroke="#d29922" stroke-width="2"/>
+            <line x1="55" y1="410" x2="160" y2="410" stroke="#d29922" stroke-width="2" marker-end="url(#arrow2y)"/>
+
+            <!-- Output -->
+            <rect x="115" y="1400" width="330" height="55" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+            <text x="280" y="1422" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="bold">OUTPUT</text>
+            <text x="280" y="1442" text-anchor="middle" fill="#79c0ff" font-size="10">bestPath, bestCost (R-factor based), pheromone map</text>
+
+            <line x1="280" y1="1455" x2="280" y2="1490" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <ellipse cx="280" cy="1510" rx="60" ry="20" fill="#da3633" stroke="#f85149" stroke-width="2"/>
+            <text x="280" y="1515" text-anchor="middle" fill="white" font-size="12" font-weight="bold">END</text>
+        </svg>
+    </div>
+
+    <div class="formula-box">
+        <div class="label">Key Formulas (ACOPathfinder class, useRoadFactor = true):</div>
+        C_i(t) = (vehicleCount × 4.5) / (lanes × distance)<br>
+        R_i(t) = d_i × (1 + C_i(t))     ← ROAD CONDITION FACTOR<br>
+        η_ij = 1 / R_i(t)                ← heuristic uses R, not d<br>
+        P_ij = [τ_ij]^α × [η_ij]^β / Σ  ← transition probability<br>
+        Evaporation: τ = τ × (1 − ρ), min = 0.001<br>
+        Deposit: Δτ = Q / pathCost<br>
+        Elitist: Δτ_best = (Q / bestCost) × 2
+    </div>
+</div>
+
+<!-- ================================================================
+     FLOWCHART 3: STANDARD ACO
+     ================================================================ -->
+<div class="flowchart-section" id="fc3">
+    <div class="flowchart-title">3️⃣ Standard ACO (Distance-Based Baseline)</div>
+    <div class="flowchart-desc">Same ACO algorithm but using physical distance d_i instead of road factor R_i</div>
+
+    <div class="flowchart-container">
+        <svg width="560" height="1050" viewBox="0 0 560 1050">
+            <defs>
+                <marker id="arrow3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#bc8cff"/>
+                </marker>
+            </defs>
+
+            <!-- START -->
+            <ellipse cx="280" cy="40" rx="110" ry="28" fill="#6e40c9" stroke="#bc8cff" stroke-width="2"/>
+            <text x="280" y="45" text-anchor="middle" fill="white" font-size="14" font-weight="bold">START STANDARD ACO</text>
+
+            <line x1="280" y1="68" x2="280" y2="108" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <!-- Input -->
+            <rect x="100" y="108" width="360" height="65" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+            <text x="280" y="128" text-anchor="middle" fill="#bc8cff" font-size="11">INPUT: source, dest</text>
+            <text x="280" y="146" text-anchor="middle" fill="#8b949e" font-size="10">α = 1.0, β = 2.0, ρ = 0.5 (DEFAULT values)</text>
+            <text x="280" y="162" text-anchor="middle" fill="#f85149" font-size="10" font-weight="bold">⚠ useRoadFactor = FALSE</text>
+
+            <line x1="280" y1="173" x2="280" y2="213" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <!-- Reset pheromones -->
+            <rect x="140" y="213" width="280" height="35" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+            <text x="280" y="235" text-anchor="middle" fill="#c9d1d9" font-size="11">resetPheromones() → τ[all] = 1.0</text>
+
+            <line x1="280" y1="248" x2="280" y2="288" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <!-- Same ACO structure -->
+            <rect x="90" y="288" width="380" height="140" rx="12" fill="#161b22" stroke="#bc8cff" stroke-width="2" stroke-dasharray="6,3"/>
+            <text x="280" y="312" text-anchor="middle" fill="#bc8cff" font-size="13" font-weight="bold">Same ACO Loop Structure</text>
+            <text x="280" y="335" text-anchor="middle" fill="#c9d1d9" font-size="10">FOR iter = 1..maxIter:</text>
+            <text x="280" y="355" text-anchor="middle" fill="#c9d1d9" font-size="10">  FOR each ant: build path using probabilities</text>
+            <text x="280" y="375" text-anchor="middle" fill="#c9d1d9" font-size="10">  Evaporate + Deposit pheromone</text>
+            <text x="280" y="395" text-anchor="middle" fill="#c9d1d9" font-size="10">  Track bestPath, bestCost</text>
+            <text x="280" y="418" text-anchor="middle" fill="#8b949e" font-size="9">(See Flowchart 2 for detailed loop)</text>
+
+            <line x1="280" y1="428" x2="280" y2="478" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <!-- KEY DIFFERENCE -->
+            <rect x="70" y="478" width="420" height="100" rx="12" fill="#1c0d2e" stroke="#f85149" stroke-width="3"/>
+            <text x="280" y="502" text-anchor="middle" fill="#f85149" font-size="14" font-weight="bold">⚡ KEY DIFFERENCE ⚡</text>
+            <text x="280" y="528" text-anchor="middle" fill="#bc8cff" font-size="11">Standard:  cost = d_i (physical distance)</text>
+            <text x="280" y="548" text-anchor="middle" fill="#bc8cff" font-size="11">           η = 1 / d_i</text>
+            <text x="280" y="568" text-anchor="middle" fill="#8b949e" font-size="10">❌ Ignores congestion, traffic, road conditions</text>
+
+            <line x1="280" y1="578" x2="280" y2="628" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <!-- VS Improved -->
+            <rect x="70" y="628" width="420" height="100" rx="12" fill="#0d2818" stroke="#3fb950" stroke-width="3"/>
+            <text x="280" y="652" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="bold">VS IMPROVED ACO</text>
+            <text x="280" y="678" text-anchor="middle" fill="#3fb950" font-size="11">Improved:  cost = R_i = d_i × (1 + C_i)</text>
+            <text x="280" y="698" text-anchor="middle" fill="#3fb950" font-size="11">           η = 1 / R_i(t)</text>
+            <text x="280" y="718" text-anchor="middle" fill="#8b949e" font-size="10">✅ Accounts for real-time congestion</text>
+
+            <line x1="280" y1="728" x2="280" y2="778" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <!-- Output -->
+            <rect x="100" y="778" width="360" height="55" rx="8" fill="#0d1117" stroke="#bc8cff" stroke-width="2"/>
+            <text x="280" y="800" text-anchor="middle" fill="#bc8cff" font-size="12" font-weight="bold">OUTPUT</text>
+            <text x="280" y="820" text-anchor="middle" fill="#c9d1d9" font-size="10">bestPath (shortest distance), bestCost (meters)</text>
+
+            <line x1="280" y1="833" x2="280" y2="873" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <!-- Comparison -->
+            <rect x="85" y="873" width="390" height="90" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+            <text x="280" y="898" text-anchor="middle" fill="#d29922" font-size="12" font-weight="bold">📊 Compare with Improved ACO</text>
+            <text x="280" y="920" text-anchor="middle" fill="#79c0ff" font-size="10">CR_std = congestionRate(stdPath)</text>
+            <text x="280" y="938" text-anchor="middle" fill="#79c0ff" font-size="10">CR_imp = congestionRate(impPath)</text>
+            <text x="280" y="953" text-anchor="middle" fill="#3fb950" font-size="10">CR_promote = (CR_std − CR_imp) / CR_std × 100%</text>
+
+            <line x1="280" y1="963" x2="280" y2="1003" stroke="#bc8cff" stroke-width="2" marker-end="url(#arrow3)"/>
+
+            <ellipse cx="280" cy="1020" rx="60" ry="20" fill="#6e40c9" stroke="#bc8cff" stroke-width="2"/>
+            <text x="280" y="1025" text-anchor="middle" fill="white" font-size="12" font-weight="bold">END</text>
+        </svg>
+    </div>
+
+    <div class="formula-box">
+        <div class="label">Comparison Metrics (Metrics class):</div>
+        Standard: edgeCost = d_i (distance in meters)<br>
+        Improved: edgeCost = R_i(t) = d_i × (1 + C_i(t))<br>
+        <br>
+        CR = Σ(R_i for congested edges) / Σ(R_i for all edges)<br>
+        where "congested" = C_i &gt; 0.3<br>
+        <br>
+        CR_promote = (CR_standard − CR_improved) / CR_standard × 100%<br>
+        Positive value = improved method avoids more congested roads ✅
+    </div>
+</div>
+
+<!-- ================================================================
+     FLOWCHART 4: DYNAMIC SIMULATION
+     ================================================================ -->
+<div class="flowchart-section" id="fc4">
+    <div class="flowchart-title">4️⃣ Dynamic Simulation (Real-time Rerouting)</div>
+    <div class="flowchart-desc">Vehicle moves along path, traffic updates each tick, reroutes when congestion exceeds thresholds</div>
+
+    <div class="flowchart-container">
+        <svg width="600" height="1650" viewBox="0 0 600 1650">
+            <defs>
+                <marker id="arrow4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/>
+                </marker>
+                <marker id="arrow4y" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#d29922"/>
+                </marker>
+                <marker id="arrow4g" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#3fb950"/>
+                </marker>
+                <marker id="arrow4r" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#f85149"/>
+                </marker>
+            </defs>
+
+            <!-- START -->
+            <ellipse cx="300" cy="40" rx="120" ry="28" fill="#238636" stroke="#3fb950" stroke-width="2"/>
+            <text x="300" y="45" text-anchor="middle" fill="white" font-size="14" font-weight="bold">START DYNAMIC SIM</text>
+
+            <line x1="300" y1="68" x2="300" y2="108" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Prerequisites -->
+            <rect x="100" y="108" width="400" height="75" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+            <text x="300" y="128" text-anchor="middle" fill="#79c0ff" font-size="11">PREREQUISITES:</text>
+            <text x="300" y="148" text-anchor="middle" fill="#c9d1d9" font-size="10">✅ PSO has optimized α, β, ρ</text>
+            <text x="300" y="163" text-anchor="middle" fill="#c9d1d9" font-size="10">✅ Improved ACO has found initial bestPath</text>
+            <text x="300" y="178" text-anchor="middle" fill="#c9d1d9" font-size="10">✅ ΔR_max and R_max thresholds are set</text>
+
+            <line x1="300" y1="183" x2="300" y2="218" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Init vehicle -->
+            <rect x="120" y="218" width="360" height="55" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="300" y="240" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Initialize Vehicle</text>
+            <text x="300" y="258" text-anchor="middle" fill="#c9d1d9" font-size="10">path = bestPath, pathIdx = 0, progress = 0</text>
+            <text x="300" y="270" text-anchor="middle" fill="#c9d1d9" font-size="10">arrived = false, reroutes = 0</text>
+
+            <line x1="300" y1="273" x2="300" y2="313" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- MAIN LOOP -->
+            <rect x="100" y="313" width="400" height="35" rx="8" fill="#21262d" stroke="#d29922" stroke-width="2.5"/>
+            <text x="300" y="335" text-anchor="middle" fill="#d29922" font-size="13" font-weight="bold">🔄 MAIN SIMULATION LOOP (each frame)</text>
+
+            <line x1="300" y1="348" x2="300" y2="388" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Arrived check -->
+            <polygon points="300,388 410,418 300,448 190,418" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="300" y="422" text-anchor="middle" fill="#d29922" font-size="11">arrived?</text>
+
+            <!-- Yes arrived -->
+            <line x1="410" y1="418" x2="530" y2="418" stroke="#3fb950" stroke-width="2"/>
+            <text x="470" y="410" fill="#3fb950" font-size="10">Yes</text>
+            <rect x="480" y="400" width="100" height="35" rx="6" fill="#1b4721" stroke="#3fb950" stroke-width="1.5"/>
+            <text x="530" y="422" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="bold">🎉 ARRIVED</text>
+            <line x1="530" y1="435" x2="530" y2="1560" stroke="#3fb950" stroke-width="2"/>
+            <line x1="530" y1="1560" x2="300" y2="1560" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow4g)"/>
+
+            <!-- No not arrived -->
+            <line x1="300" y1="448" x2="300" y2="488" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+            <text x="315" y="472" fill="#58a6ff" font-size="10">No</text>
+
+            <!-- Step 1: Advance Time -->
+            <rect x="115" y="488" width="370" height="60" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="300" y="508" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Step 1: Advance Time</text>
+            <text x="300" y="526" text-anchor="middle" fill="#c9d1d9" font-size="10">simHour += 0.005 × speed</text>
+            <text x="300" y="542" text-anchor="middle" fill="#8b949e" font-size="9">if autoAdvance enabled, wraps at 24h</text>
+
+            <line x1="300" y1="548" x2="300" y2="588" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Step 2: Update Traffic -->
+            <rect x="90" y="588" width="420" height="80" rx="8" fill="#0d1117" stroke="#f0883e" stroke-width="2"/>
+            <text x="300" y="608" text-anchor="middle" fill="#f0883e" font-size="12" font-weight="bold">Step 2: Update All Traffic</text>
+            <text x="300" y="628" text-anchor="middle" fill="#c9d1d9" font-size="10">For each edge:</text>
+            <text x="300" y="643" text-anchor="middle" fill="#79c0ff" font-size="9.5">flowIn = base + morningPeak × gauss(h) + eveningPeak × gauss(h)</text>
+            <text x="300" y="658" text-anchor="middle" fill="#79c0ff" font-size="9.5">C_i(t) = vehicleCount × L / (lanes × dist) → R_i(t) = d_i × (1+C_i)</text>
+
+            <line x1="300" y1="668" x2="300" y2="708" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Step 3: Move Vehicle -->
+            <rect x="115" y="708" width="370" height="65" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="300" y="728" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Step 3: Advance Vehicle</text>
+            <text x="300" y="748" text-anchor="middle" fill="#79c0ff" font-size="10">speedFactor = 1 / (1 + C_i) of current edge</text>
+            <text x="300" y="763" text-anchor="middle" fill="#c9d1d9" font-size="10">progress += speed × speedFactor × 0.02</text>
+
+            <line x1="300" y1="773" x2="300" y2="813" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Progress check -->
+            <polygon points="300,813 410,843 300,873 190,843" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+            <text x="300" y="847" text-anchor="middle" fill="#d29922" font-size="10">progress ≥ 1?</text>
+
+            <!-- Yes next node -->
+            <line x1="410" y1="843" x2="485" y2="843" stroke="#3fb950" stroke-width="2"/>
+            <text x="445" y="835" fill="#3fb950" font-size="9">Yes</text>
+            <rect x="485" y="825" width="90" height="35" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+            <text x="530" y="840" text-anchor="middle" fill="#3fb950" font-size="9">pathIdx++</text>
+            <text x="530" y="853" text-anchor="middle" fill="#3fb950" font-size="9">progress=0</text>
+            <line x1="530" y1="860" x2="530" y2="888" stroke="#3fb950" stroke-width="1.5"/>
+            <line x1="530" y1="888" x2="300" y2="888" stroke="#3fb950" stroke-width="1.5"/>
+
+            <!-- No continue -->
+            <line x1="300" y1="873" x2="300" y2="918" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Step 4: CHECK REROUTE -->
+            <rect x="60" y="918" width="480" height="40" rx="8" fill="#6e3404" stroke="#d29922" stroke-width="2.5"/>
+            <text x="300" y="943" text-anchor="middle" fill="#d29922" font-size="13" font-weight="bold">🚨 Step 4: CHECK REROUTE CONDITIONS</text>
+
+            <line x1="300" y1="958" x2="300" y2="998" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- For each upcoming edge -->
+            <rect x="110" y="998" width="380" height="50" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+            <text x="300" y="1018" text-anchor="middle" fill="#c9d1d9" font-size="10">For each upcoming edge on current path:</text>
+            <text x="300" y="1036" text-anchor="middle" fill="#79c0ff" font-size="10">Calculate ΔR_i = |R_i(t) − R_i(t−1)|</text>
+
+            <line x1="300" y1="1048" x2="300" y2="1088" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <!-- Condition 1 -->
+            <polygon points="300,1088 440,1118 300,1148 160,1118" fill="#21262d" stroke="#f85149" stroke-width="2"/>
+            <text x="300" y="1115" text-anchor="middle" fill="#f85149" font-size="10">ΔR_i &gt; ΔR_max</text>
+            <text x="300" y="1132" text-anchor="middle" fill="#f85149" font-size="10">OR R_i &gt; R_max ?</text>
+
+            <!-- Yes REROUTE! -->
+            <line x1="440" y1="1118" x2="520" y2="1118" stroke="#f85149" stroke-width="2.5"/>
+            <text x="475" y="1108" fill="#f85149" font-size="10" font-weight="bold">YES!</text>
+
+            <rect x="490" y="1098" width="90" height="40" rx="6" fill="#6e3404" stroke="#d29922" stroke-width="2"/>
+            <text x="535" y="1115" text-anchor="middle" fill="#d29922" font-size="10" font-weight="bold">🚨</text>
+            <text x="535" y="1130" text-anchor="middle" fill="#d29922" font-size="9">TRIGGER</text>
+
+            <line x1="535" y1="1138" x2="535" y2="1178" stroke="#d29922" stroke-width="2" marker-end="url(#arrow4y)"/>
+
+            <!-- Run reroute ACO -->
+            <rect x="415" y="1178" width="180" height="80" rx="8" fill="#0d1117" stroke="#f85149" stroke-width="2"/>
+            <text x="505" y="1198" text-anchor="middle" fill="#f85149" font-size="11" font-weight="bold">REROUTE</text>
+            <text x="505" y="1218" text-anchor="middle" fill="#c9d1d9" font-size="9">Run new ACO from</text>
+            <text x="505" y="1233" text-anchor="middle" fill="#c9d1d9" font-size="9">currentNode → dest</text>
+            <text x="505" y="1248" text-anchor="middle" fill="#79c0ff" font-size="9">(15 ants, 30 iters)</text>
+
+            <line x1="505" y1="1258" x2="505" y2="1298" stroke="#f85149" stroke-width="2" marker-end="url(#arrow4r)"/>
+
+            <!-- Update path -->
+            <rect x="415" y="1298" width="180" height="55" rx="6" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+            <text x="505" y="1318" text-anchor="middle" fill="#d29922" font-size="10">path = newPath</text>
+            <text x="505" y="1333" text-anchor="middle" fill="#d29922" font-size="10">pathIdx = 0</text>
+            <text x="505" y="1348" text-anchor="middle" fill="#d29922" font-size="10">reroutes++</text>
+
+            <line x1="415" y1="1330" x2="300" y2="1330" stroke="#d29922" stroke-width="1.5"/>
+
+            <!-- No reroute needed -->
+            <line x1="300" y1="1148" x2="300" y2="1400" stroke="#3fb950" stroke-width="2" marker-end="url(#arrow4)"/>
+            <text x="315" y="1170" fill="#3fb950" font-size="10">No</text>
+
+            <!-- Step 5: Render -->
+            <rect x="115" y="1400" width="370" height="55" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+            <text x="300" y="1420" text-anchor="middle" fill="#58a6ff" font-size="12" font-weight="bold">Step 5: Render Frame</text>
+            <text x="300" y="1438" text-anchor="middle" fill="#c9d1d9" font-size="10">Draw graph, edges (colored by C_i), vehicle position</text>
+            <text x="300" y="1450" text-anchor="middle" fill="#c9d1d9" font-size="10">Update metrics display (CR, cost, distance)</text>
+
+            <!-- Loop back -->
+            <line x1="300" y1="1455" x2="300" y2="1480" stroke="#58a6ff" stroke-width="2"/>
+            <line x1="300" y1="1480" x2="55" y2="1480" stroke="#d29922" stroke-width="2"/>
+            <line x1="55" y1="1480" x2="55" y2="418" stroke="#d29922" stroke-width="2"/>
+            <line x1="55" y1="418" x2="190" y2="418" stroke="#d29922" stroke-width="2" marker-end="url(#arrow4y)"/>
+            <text x="55" y="950" fill="#d29922" font-size="10" transform="rotate(-90,55,950)">NEXT FRAME →</text>
+
+            <!-- END -->
+            <rect x="140" y="1530" width="320" height="40" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+            <text x="300" y="1555" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="bold">SIMULATION COMPLETE — Update Final Metrics</text>
+
+            <line x1="300" y1="1570" x2="300" y2="1600" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+            <ellipse cx="300" cy="1620" rx="60" ry="20" fill="#da3633" stroke="#f85149" stroke-width="2"/>
+            <text x="300" y="1625" text-anchor="middle" fill="white" font-size="12" font-weight="bold">END</text>
+        </svg>
+    </div>
+
+    <div class="formula-box">
+        <div class="label">Key Dynamic Rerouting Logic (DynamicPlanner class):</div>
+        Vehicle speed on edge: actualSpeed = speed × 1/(1 + C_i)<br>
+        → Higher congestion = slower movement (realistic!)<br>
+        <br>
+        REROUTE TRIGGER CONDITIONS (checked every 30 frames):<br>
+        &nbsp;&nbsp;Condition 1: ΔR_i = |R_i(t) − R_i(t−1)| &gt; ΔR_max (sudden change)<br>
+        &nbsp;&nbsp;Condition 2: R_i(t) &gt; R_max (absolute congestion limit)<br>
+        <br>
+        If triggered: Run new ACO from currentNode → destination<br>
+        &nbsp;&nbsp;Using PSO-optimized params, 15 ants, 30 iterations<br>
+        &nbsp;&nbsp;New path replaces old path, reroute counter increments<br>
+        <br>
+        Traffic Model: flow = base + morning_peak×gauss(h,8.5,1.0) + evening_peak×gauss(h,18,1.5)
+    </div>
+</div>
+
+<!-- ================================================================
+     OVERALL SYSTEM FLOWCHART
+     ================================================================ -->
+<div class="flowchart-section" id="fc5">
+    <div class="flowchart-title">🔗 Overall System Pipeline</div>
+    <div class="flowchart-desc">How all four components connect in the index.html implementation</div>
+
+    <div class="flowchart-container">
+        <svg width="700" height="420" viewBox="0 0 700 420">
+            <defs>
+                <marker id="arrow5" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/>
+                </marker>
+                <marker id="arrow5w" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#d29922"/>
+                </marker>
+            </defs>
+
+            <!-- Phase A: PSO -->
+            <rect x="20" y="50" width="150" height="90" rx="12" fill="#161b22" stroke="#1f6feb" stroke-width="2.5"/>
+            <text x="95" y="75" text-anchor="middle" fill="#58a6ff" font-size="13" font-weight="bold">Phase A</text>
+            <text x="95" y="95" text-anchor="middle" fill="#c9d1d9" font-size="11">PSO</text>
+            <text x="95" y="112" text-anchor="middle" fill="#c9d1d9" font-size="11">Optimization</text>
+            <text x="95" y="132" text-anchor="middle" fill="#8b949e" font-size="9">→ α, β, ρ</text>
+
+            <line x1="170" y1="95" x2="210" y2="95" stroke="#58a6ff" stroke-width="2.5" marker-end="url(#arrow5)"/>
+
+            <!-- Phase B: Improved ACO -->
+            <rect x="210" y="50" width="150" height="90" rx="12" fill="#161b22" stroke="#238636" stroke-width="2.5"/>
+            <text x="285" y="75" text-anchor="middle" fill="#3fb950" font-size="13" font-weight="bold">Phase B</text>
+            <text x="285" y="95" text-anchor="middle" fill="#c9d1d9" font-size="11">Improved ACO</text>
+            <text x="285" y="112" text-anchor="middle" fill="#c9d1d9" font-size="11">(R_i factor)</text>
+            <text x="285" y="132" text-anchor="middle" fill="#8b949e" font-size="9">→ bestPath</text>
+
+            <line x1="360" y1="95" x2="400" y2="95" stroke="#58a6ff" stroke-width="2.5" marker-end="url(#arrow5)"/>
+
+            <!-- Phase C: Dynamic Sim -->
+            <rect x="400" y="40" width="160" height="110" rx="12" fill="#161b22" stroke="#f0883e" stroke-width="2.5"/>
+            <text x="480" y="65" text-anchor="middle" fill="#f0883e" font-size="13" font-weight="bold">Phase C</text>
+            <text x="480" y="85" text-anchor="middle" fill="#c9d1d9" font-size="11">Dynamic</text>
+            <text x="480" y="102" text-anchor="middle" fill="#c9d1d9" font-size="11">Simulation</text>
+            <text x="480" y="122" text-anchor="middle" fill="#8b949e" font-size="9">Move + Monitor</text>
+            <text x="480" y="140" text-anchor="middle" fill="#d29922" font-size="9">+ Reroute</text>
+
+            <!-- Reroute feedback arrow -->
+            <line x1="480" y1="150" x2="480" y2="210" stroke="#d29922" stroke-width="2"/>
+            <line x1="480" y1="210" x2="285" y2="210" stroke="#d29922" stroke-width="2" marker-end="url(#arrow5w)"/>
+            <text x="380" y="202" text-anchor="middle" fill="#d29922" font-size="9" font-weight="bold">Reroute → re-run ACO</text>
+
+            <rect x="245" y="195" width="80" height="30" rx="6" fill="#6e3404" stroke="#d29922" stroke-width="1.5"/>
+            <text x="285" y="214" text-anchor="middle" fill="#d29922" font-size="9">New Path</text>
+
+            <line x1="560" y1="95" x2="600" y2="95" stroke="#58a6ff" stroke-width="2.5" marker-end="url(#arrow5)"/>
+
+            <!-- Results -->
+            <rect x="600" y="55" width="80" height="80" rx="12" fill="#0d1117" stroke="#3fb950" stroke-width="2.5"/>
+            <text x="640" y="85" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="bold">✅</text>
+            <text x="640" y="105" text-anchor="middle" fill="#c9d1d9" font-size="10">Arrived</text>
+            <text x="640" y="120" text-anchor="middle" fill="#8b949e" font-size="9">+ Metrics</text>
+
+            <!-- Parallel: Standard ACO -->
+            <rect x="210" y="280" width="150" height="80" rx="12" fill="#161b22" stroke="#bc8cff" stroke-width="2" stroke-dasharray="6,3"/>
+            <text x="285" y="305" text-anchor="middle" fill="#bc8cff" font-size="12" font-weight="bold">Standard ACO</text>
+            <text x="285" y="325" text-anchor="middle" fill="#c9d1d9" font-size="10">(distance only)</text>
+            <text x="285" y="345" text-anchor="middle" fill="#8b949e" font-size="9">→ baseline path</text>
+
+            <!-- Comparison arrow -->
+            <line x1="360" y1="320" x2="430" y2="320" stroke="#bc8cff" stroke-width="2"/>
+
+            <rect x="430" y="280" width="180" height="80" rx="12" fill="#0d1117" stroke="#d29922" stroke-width="2"/>
+            <text x="520" y="305" text-anchor="middle" fill="#d29922" font-size="12" font-weight="bold">📊 Compare</text>
+            <text x="520" y="325" text-anchor="middle" fill="#79c0ff" font-size="10">CR_std vs CR_imp</text>
+            <text x="520" y="345" text-anchor="middle" fill="#3fb950" font-size="10">CR_promote = Δ%</text>
+
+            <!-- Traffic Sim box -->
+            <rect x="20" y="190" width="150" height="70" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+            <text x="95" y="215" text-anchor="middle" fill="#8b949e" font-size="11">Traffic Simulator</text>
+            <text x="95" y="235" text-anchor="middle" fill="#79c0ff" font-size="9">Gaussian peaks</text>
+            <text x="95" y="250" text-anchor="middle" fill="#79c0ff" font-size="9">f_in, f_out, C_i, R_i</text>
+
+            <!-- Feeds into everything -->
+            <line x1="170" y1="225" x2="210" y2="130" stroke="#30363d" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <line x1="170" y1="225" x2="400" y2="130" stroke="#30363d" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <text x="250" y="180" fill="#8b949e" font-size="8">feeds traffic data</text>
+
+            <!-- Labels -->
+            <text x="95" y="35" text-anchor="middle" fill="#1f6feb" font-size="10">Press P</text>
+            <text x="285" y="35" text-anchor="middle" fill="#238636" font-size="10">Press A</text>
+            <text x="480" y="25" text-anchor="middle" fill="#f0883e" font-size="10">Press Space</text>
+            <text x="285" y="270" text-anchor="middle" fill="#bc8cff" font-size="10">Press S</text>
+            <text x="520" y="270" text-anchor="middle" fill="#d29922" font-size="10">Press C</text>
+
+            <!-- Complexity note -->
+            <text x="350" y="400" text-anchor="middle" fill="#8b949e" font-size="10">
+                Algorithm Complexity: O(n × (n−1)² × m × T/2) where n=nodes, m=ants, T=iterations
+            </text>
+        </svg>
+    </div>
+</div>
+
+<div style="text-align:center; margin: 40px 0; color: #8b949e; font-size: 0.85em;">
+    <p>📄 All flowcharts based on the <code>index.html</code> implementation</p>
+    <p>Paper: "Dynamic Path Planning Based on Improved ACO in Traffic Congestion" — Wu et al.</p>
+    <p style="margin-top: 10px;">💡 <b>To save as images:</b> Use browser Print (Ctrl+P → PDF), or right-click → screenshot, or use a browser extension</p>
+</div>
+
+</body>
+</html>

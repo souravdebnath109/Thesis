@@ -1,0 +1,5 @@
+road_id,road_name,from_intersection,to_intersection,distance_km,num_lanes,road_type,speed_limit_kmh,condition
+0,Kazi Nazrul Islam Avenue,0,1,1.16,4,arterial,40,poor
+1,Karwan Bazar Road,1,2,0.76,3,arterial,40,good
+2,Farmgate Link Road,2,3,3.15,4,arterial,60,poor
+3,Shahbag Road,0,2,1.9,4,arterial,60,fair

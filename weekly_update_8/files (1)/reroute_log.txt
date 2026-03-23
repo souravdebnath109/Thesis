@@ -1,0 +1,4 @@
+step,cur_node,event,best_cost,ar,path
+0,1,TRIGGER_KEPT,420.59,127.57,0-1-5-9
+1,5,TRIGGER_KEPT,420.59,266.38,0-1-5-9
+2,9,OK,420.59,502.82,0-1-5-9

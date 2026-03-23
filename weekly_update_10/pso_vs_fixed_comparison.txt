@@ -1,0 +1,47 @@
+================================================================
+  PSO-OPTIMIZED vs FIXED PARAMETER COMPARISON REPORT
+================================================================
+
+  PSO approach (old_flowchart.png):
+    Phase 1: PSO tunes alpha, beta, rho per S-D pair
+    Phase 2: ACO with tuned params
+    Phase 3: Dynamic re-planning with tuned params
+
+  Fixed approach (latest_flowchart.png):
+    Phase 1: ACO with fixed alpha=0.5, beta=1, rho=0.95
+    Phase 2: Dynamic re-planning with same fixed params
+
+ Pair  Src  Dst      PSO Cost    Fixed Cost      Diff %    Winner
+-----------------------------------------------------------------
+    0    0    9        513.73        420.09      -18.2%     FIXED
+    1    0    7        495.18        493.55       -0.3%     FIXED
+    2    0    3        412.70        380.17       -7.9%     FIXED
+    3    1    8        279.67        285.74        2.2%       PSO
+    4    1    9        318.58        347.56        9.1%       PSO
+    5    2    8        402.65        430.75        7.0%       PSO
+    6    2    9        278.32        317.28       14.0%       PSO
+    7    3    9        379.17        381.60        0.6%       PSO
+    8    4    7        367.17        368.14        0.3%       PSO
+    9    4    9        317.58        343.33        8.1%       PSO
+   10    5    9        211.40        213.75        1.1%       PSO
+   11    6    9        417.93        161.77      -61.3%     FIXED
+   12    7    0        470.51        442.37       -6.0%     FIXED
+   13    7    9        294.25        275.46       -6.4%     FIXED
+   14    8    1        217.97        218.32        0.2%       PSO
+   15    9    0        358.89        363.13        1.2%       PSO
+   16    9    3        359.28        341.58       -4.9%     FIXED
+-----------------------------------------------------------------
+
+SUMMARY:
+  Total pairs compared          : 17
+  PSO-Optimized avg final cost   : 358.53
+  Fixed-param avg final cost     : 340.27
+  PSO improvement over Fixed     : -5.4%
+
+  PSO wins (lower cost)          : 10
+  Fixed wins (lower cost)        : 7
+  Ties                           : 0
+
+CONCLUSION:
+  In this particular run, results were comparable or fixed params
+  performed well. Consider adjusting fixed param values or network.

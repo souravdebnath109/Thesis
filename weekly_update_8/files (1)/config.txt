@@ -1,0 +1,45 @@
+# ════════════════════════════════════════════════════════════════
+# config.txt — External Parameter File for PSO-ACO Path Planner
+# Based on: Wu et al., "Dynamic Path Planning Based on Improved
+#           Ant Colony Algorithm in Traffic Congestion," 2020
+#
+# FORMAT:  KEY = VALUE   (lines starting with # are comments)
+# ════════════════════════════════════════════════════════════════
+
+# ── Graph / Problem Setup ────────────────────────────────────────
+START_NODE      = 0       # Starting intersection index
+END_NODE        = 9       # Destination intersection index
+MAP_FILE        = map_data.csv
+
+# ── Vehicle Model ────────────────────────────────────────────────
+AVG_VEHICLE_LEN = 5.0     # L in metres (average car length, paper §IV-B)
+
+# ── Dynamic Trigger Thresholds ───────────────────────────────────
+R_MAX           = 150.0   # Rmax  — re-plan if Ri(t) exceeds this
+DELTA_R_MAX     = 5.0      # ΔRmax — re-plan if |Ri(t+1)−Ri(t)| > this
+
+# ── PSO Parameters (for ACO parameter tuning) ────────────────────
+PSO_SWARM_SIZE  = 30      # Number of PSO particles
+PSO_ITERATIONS  = 100     # PSO optimisation iterations
+PSO_W           = 0.7     # Inertia weight  (w)
+PSO_C1          = 1.5     # Cognitive acceleration (c1)
+PSO_C2          = 1.5     # Social acceleration    (c2)
+
+# ACO param search bounds (paper §IV-C: 0.5≤α≤1.5, 1≤β≤5, 0.5≤ρ≤1)
+ALPHA_MIN       = 0.5
+ALPHA_MAX       = 1.5
+BETA_MIN        = 1.0
+BETA_MAX        = 5.0
+RHO_MIN         = 0.5
+RHO_MAX         = 1.0
+
+# ── ACO Parameters (tuned by PSO; defaults used if PSO disabled) ─
+NUM_ANTS        = 10      # m  — ant colony size (paper §V)
+ACO_ITERATIONS  = 100     # Q  — max iterations per ACO run
+Q_CONST         = 100.0   # Q constant for pheromone deposit formula
+TAU_INIT        = 1.0     # Initial pheromone on every edge
+
+# ── Simulation ───────────────────────────────────────────────────
+SIM_STEPS       = 20      # Number of dynamic time-steps to simulate
+TRAFFIC_NOISE   = 0.5       # Fractional random variation in traffic/step
+RANDOM_SEED     = 42      # For reproducibility (0 = truly random)

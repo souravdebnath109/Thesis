@@ -1,0 +1,131 @@
+================================================================
+  NETWORK-LEVEL ANALYSIS (Combined Route Optimization)
+================================================================
+
+1. EDGE USAGE FREQUENCY (across all successful routes)
+   (Higher frequency = potential bottleneck in combined optimization)
+
+        Edge      Freq    Used by pairs
+------------------------------------------------------------
+    6 ->  9         5    [P6,P7,P10,P11,P13]
+    1 ->  5         4    [P0,P2,P3,P4]
+    5 ->  6         3    [P2,P8,P10]
+    5 ->  8         3    [P3,P4,P5]
+    0 ->  1         2    [P0,P2]
+    2 ->  3         2    [P2,P16]
+    6 ->  7         2    [P1,P8]
+    6 ->  2         2    [P2,P16]
+    5 ->  9         2    [P0,P9]
+    9 ->  6         1    [P16]
+    8 ->  9         1    [P4]
+    8 ->  5         1    [P14]
+    7 ->  3         1    [P12]
+    5 ->  1         1    [P14]
+    4 ->  5         1    [P8]
+    4 ->  0         1    [P15]
+    3 ->  2         1    [P12]
+    2 ->  6         1    [P6]
+    2 ->  1         1    [P12]
+    1 ->  0         1    [P12]
+
+2. NODE USAGE FREQUENCY (across all successful routes)
+   (Higher frequency = critical intersection in the network)
+
+    Node      Freq    Used by pairs
+------------------------------------------------------------
+      5         9    [P0,P2,P3,P4,P5,P8,P9,P10,P14]
+      6         9    [P1,P2,P6,P7,P8,P10,P11,P13,P16]
+      9         9    [P0,P4,P6,P7,P9,P10,P11,P13,P16]
+      1         6    [P0,P2,P3,P4,P12,P14]
+      0         4    [P0,P2,P12,P15]
+      2         4    [P2,P6,P12,P16]
+      8         4    [P3,P4,P5,P14]
+      3         3    [P2,P12,P16]
+      7         3    [P1,P8,P12]
+      4         2    [P8,P15]
+
+3. SHARED EDGES (used by 2+ routes -- combined route overlap)
+   These edges represent the network segments where multiple S-D
+   routes overlap. In combined route optimization, these edges
+   would experience higher aggregate traffic load.
+
+   Edge 6 -> 9  shared by 5 routes: (2->9), (3->9), (5->9), (6->9), (7->9)
+   Edge 1 -> 5  shared by 4 routes: (0->9), (0->3), (1->8), (1->9)
+   Edge 5 -> 6  shared by 3 routes: (0->3), (4->7), (5->9)
+   Edge 5 -> 8  shared by 3 routes: (1->8), (1->9), (2->8)
+   Edge 0 -> 1  shared by 2 routes: (0->9), (0->3)
+   Edge 2 -> 3  shared by 2 routes: (0->3), (9->3)
+   Edge 6 -> 7  shared by 2 routes: (0->7), (4->7)
+   Edge 6 -> 2  shared by 2 routes: (0->3), (9->3)
+   Edge 5 -> 9  shared by 2 routes: (0->9), (4->9)
+
+4. CRITICAL NODES (used by 3+ routes -- key intersections)
+
+   Node 5  used by 9 routes: (0->9), (0->3), (1->8), (1->9), (2->8), (4->7), (4->9), (5->9), (8->1)
+   Node 6  used by 9 routes: (0->7), (0->3), (2->9), (3->9), (4->7), (5->9), (6->9), (7->9), (9->3)
+   Node 9  used by 9 routes: (0->9), (1->9), (2->9), (3->9), (4->9), (5->9), (6->9), (7->9), (9->3)
+   Node 1  used by 6 routes: (0->9), (0->3), (1->8), (1->9), (7->0), (8->1)
+   Node 0  used by 4 routes: (0->9), (0->3), (7->0), (9->0)
+   Node 2  used by 4 routes: (0->3), (2->9), (7->0), (9->3)
+   Node 8  used by 4 routes: (1->8), (1->9), (2->8), (8->1)
+   Node 3  used by 3 routes: (0->3), (7->0), (9->3)
+   Node 7  used by 3 routes: (0->7), (4->7), (7->0)
+
+5. STABILIZED ROUTE SUMMARY
+   Final routes after dynamic re-planning for all S-D pairs:
+
+ Pair     Src     Dst   Init Cost  Final Cost  Reroutes   Reached  Final Path
+----------------------------------------------------------------------------------------------------
+    0       0       9      420.59      425.42         0       YES  0->1->5->9
+    1       0       7      475.00      518.04         1       YES  6->7
+    2       0       3      569.50      669.37         0       YES  0->1->5->6->2->3
+    3       1       8      257.00      278.43         0       YES  1->5->8
+    4       1       9      389.33      447.37         0       YES  1->5->8->9
+    5       2       8      367.00      431.74         1       YES  5->8
+    6       2       9      299.50      313.49         0       YES  2->6->9
+    7       3       9      439.00      467.74         1       YES  6->9
+    8       4       7      369.17      374.63         0       YES  4->5->6->7
+    9       4       9      314.75      341.98         1       YES  5->9
+   10       5       9      293.00      298.38         0       YES  5->6->9
+   11       6       9      170.50      180.89         0       YES  6->9
+   12       7       0      432.50      460.73         0       YES  7->3->2->1->0
+   13       7       9      519.83      321.72         1       YES  6->9
+   14       8       1      212.50      210.68         0       YES  8->5->1
+   15       9       0      355.09      369.26         1       YES  4->0
+   16       9       3      349.50      373.86         0       YES  9->6->2->3
+----------------------------------------------------------------------------------------------------
+
+  SUMMARY STATISTICS:
+    Total S-D pairs processed : 17
+    Successfully reached      : 17 / 17
+    Total reroutes across all  : 6
+    Average final cost (succ.) : 381.40
+    Total unique edges used    : 20
+    Shared edges (2+ routes)   : 9
+    Total unique nodes used    : 10
+    Critical nodes (3+ routes) : 9
+
+6. COMBINED ROUTE OPTIMIZATION INSIGHT
+
+   In a pure independent optimization, each S-D pair is solved
+   without considering traffic from other pairs. The analysis above
+   shows which edges/nodes are over-utilized when routes are computed
+   independently.
+
+   Key observation for combined optimization:
+   - Edges with frequency >= 2 would benefit from load balancing
+   - Critical nodes (freq >= 3) are bottleneck intersections
+   - If routes were computed jointly (considering aggregate traffic),
+     some routes would shift to alternative paths to reduce
+     congestion on shared segments.
+
+   This forms the basis for iterative combined optimization:
+   1. Compute all routes independently (current approach)
+   2. Measure edge/node frequencies
+   3. Increase traffic weights on high-frequency edges
+   4. Re-optimize routes with updated weights
+   5. Repeat until route assignment stabilizes
+
+================================================================
+  End of Network Analysis
+================================================================
