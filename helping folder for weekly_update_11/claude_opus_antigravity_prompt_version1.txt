@@ -1,0 +1,173 @@
+You are acting as a careful research engineer and coding assistant inside Antigravity / Claude Opus.
+
+I have an existing thesis codebase here:
+https://github.com/souravdebnath109/Thesis/tree/main/weekly_update_10
+
+Use that repository folder as the implementation baseline. The folder already contains the existing dynamic path-planning work, including items such as pso_aco_planner.cpp, pso_aco_planner_fixed.cpp, generate_dataset.py, config.txt, map_data.csv, sd_pairs.csv, INSTRUCTIONS.md, node_connectivity_graph.png, latest_flowchart.png, and prior result/report files. Do not ignore the current structure. Read the repository first, understand what is already implemented, and then extend it carefully instead of rewriting everything blindly.
+
+IMPORTANT WORKING STYLE
+1. Do not make unsupported claims.
+2. If something is an assumption, clearly label it as an assumption.
+3. Do not say case 3 is already better unless the experiments prove it.
+4. Preserve reproducibility as much as possible.
+5. Keep all new logic configurable through data/config files where possible.
+6. Prefer clear modular code and explicit output files.
+
+RESEARCH CONTEXT
+My old work was dynamic path planning with improved ACO and combined route optimization.
+Now the supervisor has changed the focus.
+
+The new focus is NOT only “best path in normal condition”.
+The new focus is: when a route is suddenly blocked, a link is broken, or a protest blocks a road, how fast vehicles can move through alternative feasible paths in an unplanned megacity like Dhaka.
+
+I need the updated framework to be vehicle-aware and route-hierarchy-aware.
+
+VEHICLE CATEGORIES
+Category 1: Truck
+Category 2: Bus (bus routes are predefined)
+Category 3: Private car, Microbus
+Category 4: Rickshaw, Van, Bike
+
+ROUTE HIERARCHY
+Main route
+Link route
+Subroute
+Mini route
+
+ACCESS LOGIC
+- Not all routes are suitable for all vehicles.
+- Truck and bus cannot go through all routes.
+- Bus must respect predefined bus corridors / allowed bus roads.
+- Private car and microbus can use more routes than truck and bus, but still not every route.
+- Rickshaw, van, and bike can use all route types.
+- Route width and road condition must be enforced category-wise.
+
+I want source-destination path selection to always maintain vehicle-category feasibility.
+
+MAIN RESEARCH DESIGN
+Build a revised path-planning and rerouting framework for Dhaka with the following ideas:
+
+A. STEADY-STATE / NORMAL NETWORK PREPARATION
+1. Build a road graph with road class, width, and condition information.
+2. Add vehicle-category access constraints on edges.
+3. For every source-destination pair and every relevant vehicle category, compute stable feasible routes.
+4. Build a combined stable network, not only isolated pair solutions.
+5. Create a POOL for every source-destination pair and vehicle category.
+
+POOL DEFINITION
+- A pool is a group of 5 alternative paths for the same (source, destination, vehicle category).
+- The 5 paths must be feasible and sorted from best to worst.
+- I need pair-level pools and also a network-level view of pooled alternatives / shared-edge usage.
+
+B. BLOCKAGE / DISRUPTION RESPONSE
+When a sudden block appears, a link breaks, or a protest closes a road:
+- all source-destination pairs whose chosen paths use that blocked edge become affected,
+- rerouting must remain category-wise feasible,
+- the framework must compare 3 cases.
+
+THREE CASES
+
+CASE 1: Source-based reroute
+- Example only: for source 0 and destination 9, if edge 5-9 is blocked, recompute an alternative route from source 0 to destination 9 while avoiding the blocked edge.
+- This example is illustrative only; the implementation must work for all source-destination pairs and all relevant categories.
+
+CASE 2: Current-position reroute with congestion increase
+- Example only: for source 0 and destination 9, if edge 5-9 is blocked and the vehicle has already reached node 5 or is near the blocked area, increase weight / congestion around that area and reroute from the current node or current local position.
+- Again, implement this for all pairs, not only the example.
+
+CASE 3: Pool-based reroute (PROPOSED METHOD)
+- Use the precomputed pool when the sudden block occurs.
+- Instantly check the 5 candidate paths.
+- Remove the paths that contain blocked / infeasible edges.
+- Choose the best remaining feasible path.
+- Only if the whole pool becomes invalid, do a lightweight pool repair or pool refresh.
+- This case should be designed to reduce online reroute iterations, computation time, and computational power relative to case 1 and case 2.
+- But do not claim superiority without measured experiments.
+
+HIGH-RISK LINKS IN STEADY-STATE POOL BUILDING
+During pool generation in steady-state, include the idea that some known roads/areas can have a higher prior probability of breakage or blockage.
+Examples such as Shahbagh and Science Lab are illustrative high-risk examples only.
+Treat them as examples of links with higher disruption probability, not as fixed facts unless data is provided.
+Make this configurable as a prior-risk or disruption-probability field.
+
+REQUIRED COMPARISON METRICS
+For case 1, case 2, and case 3, report at least:
+1. Online reroute iterations
+2. Online computation time
+3. Computational power or energy proxy
+4. Reroute success / feasible arrival
+5. Final path cost / congestion-aware path quality
+
+IMPORTANT NOTE ABOUT POWER
+If actual hardware power measurement is not realistically available in the environment, do NOT fake it.
+Instead, implement and report a clearly labeled proxy such as CPU time, process time, or an estimated energy proxy under fixed hardware conditions.
+
+IMPLEMENTATION REQUIREMENTS
+1. Reuse the current weekly_update_10 codebase as the base.
+2. Extend the data model so each edge can store at least:
+   - road_class
+   - width
+   - road_condition
+   - allowed vehicle categories or per-category minimum width
+   - optional bus corridor flag
+   - optional disruption prior / blockage probability
+3. Keep the current improved ACO / combined optimization logic when possible, but adapt it to the new vehicle-aware problem.
+4. Add code to generate and save pools.
+5. Add code to simulate disruption events.
+6. Add code to identify all affected source-destination pairs after a blockage.
+7. Add code to run and compare case 1, case 2, case 3.
+8. Add result files that are easy to analyze.
+9. Keep the code readable and modular.
+
+EXPECTED OUTPUT FILES
+Please generate or propose a clean output structure such as:
+- pair_stable_routes.csv
+- pair_pools.json or csv
+- network_pool_analysis.txt
+- disruption_events.csv
+- case1_results.csv
+- case2_results.csv
+- case3_results.csv
+- case_comparison_summary.csv
+- reroute_log_case1.txt
+- reroute_log_case2.txt
+- reroute_log_case3.txt
+- updated_flowchart.png or .dot/.mermaid
+- updated_research_notes.md
+
+WHAT I WANT FROM YOU IN YOUR RESPONSE
+Please work in this order:
+
+STEP 1
+Read and summarize the current weekly_update_10 repository structure and explain the existing logic briefly.
+
+STEP 2
+Propose the revised architecture for the new research problem.
+
+STEP 3
+Specify the exact data schema changes needed for map_data/config/input files.
+
+STEP 4
+Implement or draft the code changes carefully.
+If you cannot literally edit files in-place, then provide full replacement files or clearly separated new files.
+
+STEP 5
+Provide the revised flowchart.
+
+STEP 6
+Provide an experiment plan for all source-destination pairs and all vehicle categories.
+
+STEP 7
+Explain clearly why case 3 is expected to be better in online rerouting cost, while still marking it as a hypothesis until measured.
+
+ADDITIONAL RESEARCH PHRASING
+Use academically careful language.
+Prefer phrases like:
+- “proposed method”
+- “expected to reduce online rerouting cost”
+- “to be validated experimentally”
+- “category-wise feasible rerouting”
+- “pair-level and network-level resilience”
+
+FINAL GOAL
+Help me turn the current ACO dynamic path-planning code into a vehicle-aware, blockage-aware, pool-based alternative path-planning framework for Dhaka, where case 3 is the proposed contribution and is experimentally compared against case 1 and case 2 for all source-destination pairs.

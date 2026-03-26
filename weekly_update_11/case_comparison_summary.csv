@@ -1,0 +1,4 @@
+case,total_affected,successful_reroutes,avg_iterations,avg_reroute_time_ms,avg_energy_proxy,avg_final_cost
+1,23,5,100.00,3.2950,0.0033,501.83
+2,23,5,100.00,3.6738,0.0037,1208.17
+3,23,5,23.91,0.6057,0.0006,542.33

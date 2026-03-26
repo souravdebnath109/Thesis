@@ -1,0 +1,65 @@
+================================================================
+  COMBINED ROUTE OPTIMIZATION: COMPARISON REPORT
+================================================================
+
+1. CONVERGENCE HISTORY
+   Shows how average route cost changes across combined iterations.
+
+      Iter      Avg Cost      Change %      Reroutes   Route Changes
+--------------------------------------------------------------------
+         1        346.49       100.00%             4              17
+         2        390.07        12.58%             5               7
+         3        366.14         6.13%             4              11
+         4        382.08         4.36%             5               8
+
+2. PER-PAIR COMPARISON: INDEPENDENT vs COMBINED
+   Shows cost difference and route changes per S-D pair.
+
+ Pair   Src   Dst    Indep Cost     Comb Cost      Diff %   Route Same?  Independent Path -> Combined Path
+--------------------------------------------------------------------------------------------------------------
+    0     0     9        420.09        520.15       23.8%            NO  0->1->5->9 -> 4->5->9
+    1     0     7        493.55        531.91        7.8%            NO  5->6->7 -> 0->1->5->6->7
+    2     0     3        380.17        455.50       19.8%           YES  1->2->3 -> 1->2->3
+    3     1     8        285.74        306.69        7.3%           YES  1->5->8 -> 1->5->8
+    4     1     9        347.56        358.73        3.2%           YES  1->5->9 -> 1->5->9
+    5     2     8        430.75        453.53        5.3%            NO  2->1->5->8 -> 5->8
+    6     2     9        317.28        328.02        3.4%            NO  6->9 -> 2->6->9
+    7     3     9        381.60        421.80       10.5%           YES  3->2->6->9 -> 3->2->6->9
+    8     4     7        368.14        392.50        6.6%           YES  5->6->7 -> 5->6->7
+    9     4     9        343.33        370.67        8.0%            NO  4->5->9 -> 5->9
+   10     5     9        213.75        199.82       -6.5%           YES  5->9 -> 5->9
+   11     6     9        161.77        179.65       11.1%           YES  6->9 -> 6->9
+   12     7     0        442.37        457.99        3.5%           YES  7->3->2->1->0 -> 7->3->2->1->0
+   13     7     9        275.46        339.72       23.3%           YES  7->6->9 -> 7->6->9
+   14     8     1        218.32        426.41       95.3%            NO  8->5->1 -> 8->4->5->1
+   15     9     0        363.13        381.34        5.0%           YES  9->8->4->0 -> 9->8->4->0
+   16     9     3        341.58        370.95        8.6%            NO  9->6->2->3 -> 9->6->7->3
+--------------------------------------------------------------------------------------------------------------
+
+3. OVERALL COMPARISON SUMMARY
+
+   Independent optimization:
+     Successful routes : 17 / 17
+     Average cost      : 340.27
+
+   Combined optimization (final iteration):
+     Successful routes : 17 / 17
+     Average cost      : 382.08
+
+   Pairs improved (lower cost with combined) : 1
+   Pairs worsened (higher cost)              : 16
+   Pairs with same final route               : 10 / 17
+   Overall avg cost change                   : 12.29%
+
+   Interpretation:
+   -> Combined optimization INCREASED average cost.
+      This is expected: routes now account for aggregate traffic,
+      yielding more realistic (but costlier) individual paths.
+      The NETWORK as a whole is more balanced.
+
+   Combined iterations until stabilization : 4
+   Final convergence change                : 4.36%
+
+================================================================
+  End of Comparison Report
+================================================================

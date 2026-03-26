@@ -1,0 +1,61 @@
+# ════════════════════════════════════════════════════════════════
+# config.txt — External Parameter File for Vehicle-Aware Pool-Based
+#              Rerouting Framework (Dhaka)
+# Extended from: Wu et al., "Dynamic Path Planning Based on Improved
+#                Ant Colony Algorithm in Traffic Congestion," 2020
+#
+# FORMAT:  KEY = VALUE   (lines starting with # are comments)
+# ════════════════════════════════════════════════════════════════
+
+# ── Graph / Problem Setup ────────────────────────────────────────
+MAP_FILE        = map_data.csv
+PAIRS_FILE      = sd_pairs.csv
+DISRUPTION_FILE = disruption_events.csv
+
+# ── Vehicle Model ────────────────────────────────────────────────
+AVG_VEHICLE_LEN = 5.0     # L in metres (average car length, paper IV-B)
+
+# ── Vehicle Categories ───────────────────────────────────────────
+# Cat 1: Truck
+# Cat 2: Bus (predefined corridors only)
+# Cat 3: Private car, Microbus
+# Cat 4: Rickshaw, Van, Bike
+VEHICLE_CATEGORIES = 4
+
+# ── Category-wise Minimum Width (metres) ─────────────────────────
+CAT1_MIN_WIDTH    = 6.0
+CAT2_MIN_WIDTH    = 5.0
+CAT3_MIN_WIDTH    = 3.5
+CAT4_MIN_WIDTH    = 2.0
+
+# ── Pool Parameters ──────────────────────────────────────────────
+POOL_SIZE         = 5       # Number of alternative paths per (s,d,v)
+
+# ── Dynamic Trigger Thresholds ───────────────────────────────────
+R_MAX           = 150.0   # Rmax  — re-plan if Ri(t) exceeds this
+DELTA_R_MAX     = 5.0     # delta_Rmax — re-plan if |Ri(t+1)-Ri(t)| > this
+
+# ── ACO Parameters (fixed, per supervisor flowchart) ─────────────
+FIXED_ALPHA     = 1.0
+FIXED_BETA      = 2.0
+FIXED_RHO       = 0.5
+NUM_ANTS        = 10      # m  — ant colony size
+ACO_ITERATIONS  = 100     # max iterations per ACO run
+Q_CONST         = 100.0   # Q constant for pheromone deposit
+TAU_INIT        = 1.0     # Initial pheromone on every edge
+
+# ── Simulation ───────────────────────────────────────────────────
+SIM_STEPS       = 20      # Number of dynamic time-steps to simulate
+TRAFFIC_NOISE   = 0.5     # Fractional random variation in traffic/step
+RANDOM_SEED     = 42      # For reproducibility (0 = truly random)
+
+# ── Combined Route Optimization ──────────────────────────────────
+COMBINED_OPT      = 1      # 0=independent only, 1=run combined optimization
+COMBINED_ITERS    = 5      # Max outer-loop iterations
+COMBINED_WEIGHT   = 0.3    # Traffic accumulation weight per iteration
+STABILITY_THRESH  = 0.05   # Stop if avg cost change < 5%
+
+# ── Disruption Response Parameters ───────────────────────────────
+DISRUPTION_BLOCK_WEIGHT   = 1000.0  # Weight multiplier for blocked edges
+DISRUPTION_CONGEST_RADIUS = 2       # Hops around blocked area (Case 2)
+CONGESTION_INCREASE       = 3.0     # Weight multiplier near blocked area

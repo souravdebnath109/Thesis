@@ -1,0 +1,85 @@
+# Walkthrough: Vehicle-Aware Pool-Based Rerouting Framework
+
+## What Was Built
+
+A complete vehicle-aware, pool-based rerouting framework in `weekly_update_11` that follows the supervisor flowchart exactly (Steps A, B, C).
+
+### Files Created
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| [vehicle_pool_planner.cpp](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/vehicle_pool_planner.cpp) | ~1475 | Core C++ planner with 15 sections |
+| [generate_dataset.py](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/generate_dataset.py) | ~170 | Extended dataset generator |
+| [config.txt](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/config.txt) | ~50 | Extended configuration (50+ params) |
+| [updated_research_notes.md](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/updated_research_notes.md) | ~200 | Research notes, experiment plan, hypothesis |
+
+### Pipeline: Step A → Step B → Step C
+
+![Framework Flowchart](C:\Users\HP\.gemini\antigravity\brain\ac8f5b80-93d3-4b47-9da2-b95cbb26c7da\framework_flowchart_1774439625761.png)
+
+---
+
+## Key Results
+
+### Vehicle Category Reachability
+
+| Category | Reached | Success Rate |
+|----------|---------|-------------|
+| Truck | 17/17 | 100% |
+| Bus | 17/17 | 100% |
+| Car/Microbus | 15/17 | 88% |
+| Rickshaw/Van/Bike | 13/17 | 76% |
+
+### Case Comparison (Core Result)
+
+| Metric | Case 1 (Source) | Case 2 (Current-pos) | **Case 3 (Pool)** |
+|--------|:-:|:-:|:-:|
+| Avg iterations | 100.0 | 100.0 | **23.9 (−76%)** |
+| Avg time (ms) | 3.295 | 3.674 | **0.606 (−82%)** |
+| Avg energy proxy | 0.0033 | 0.0037 | **0.0006 (−82%)** |
+| Avg final cost | 501.83 | 1208.17 | 542.33 |
+
+> [!IMPORTANT]
+> **Case 3 (pool-based) achieves 5.4× faster response time and 76% fewer iterations** than standard rerouting, with only ~8% cost increase over Case 1. This supports the hypothesis.
+
+### Output Files Generated (14 files)
+
+````carousel
+```
+pair_stable_routes.csv   — Final routes per (s,d,v)
+pair_pools.json          — Pool of alternative paths
+pair_metadata.csv        — Per-pair metadata
+network_pool_analysis.txt — Network-level analysis
+```
+<!-- slide -->
+```
+case1_results.csv          — Source reroute results
+case2_results.csv          — Current-position results
+case3_results.csv          — Pool-based results
+case_comparison_summary.csv — Side-by-side comparison
+```
+<!-- slide -->
+```
+reroute_log.txt            — Independent optimization log
+reroute_log_combined.txt   — Combined optimization log
+reroute_log_case1.txt      — Case 1 reroute log
+reroute_log_case2.txt      — Case 2 reroute log
+reroute_log_case3.txt      — Case 3 reroute log
+```
+````
+
+## Verification
+
+- **Compilation**: `g++ -std=c++17 -O2` — success ✅
+- **Execution**: Exit code 0, all output files generated ✅
+- **Case comparison**: Case 3 shows expected reduction in iterations/time ✅
+- **Reproducibility**: Random seed 42, deterministic results ✅
+
+## How to Run
+
+```bash
+cd e:\akhand_sir_research_topic\dorkari\weekly_update_11
+python generate_dataset.py                    # Generate input data
+g++ -std=c++17 -O2 -o vehicle_pool_planner.exe vehicle_pool_planner.cpp
+.\vehicle_pool_planner.exe > output.txt 2>&1  # Run full pipeline
+```

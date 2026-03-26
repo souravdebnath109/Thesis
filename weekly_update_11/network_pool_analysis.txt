@@ -1,0 +1,107 @@
+================================================================
+  NETWORK-LEVEL POOL ANALYSIS
+================================================================
+
+1. EDGE USAGE FREQUENCY
+   5 -> 9  freq=19
+   6 -> 9  freq=12
+   1 -> 2  freq=10
+   2 -> 6  freq=9
+   2 -> 3  freq=8
+   0 -> 1  freq=8
+   9 -> 8  freq=7
+   4 -> 0  freq=7
+   4 -> 5  freq=7
+   5 -> 4  freq=6
+   7 -> 6  freq=6
+   6 -> 7  freq=6
+   6 -> 5  freq=5
+   5 -> 1  freq=4
+   4 -> 8  freq=4
+   8 -> 9  freq=3
+   9 -> 5  freq=3
+   0 -> 4  freq=3
+   3 -> 2  freq=2
+   1 -> 5  freq=2
+   1 -> 0  freq=2
+   8 -> 5  freq=2
+   5 -> 8  freq=1
+   8 -> 4  freq=1
+
+2. POOL DIVERSITY PER PAIR
+   P0 (0->9 Truck): 1 pool paths
+   P1 (0->9 Bus): 1 pool paths
+   P2 (0->9 Car/Micro): 1 pool paths
+   P3 (0->9 Rick/Van/Bike): 2 pool paths
+   P4 (0->7 Truck): 1 pool paths
+   P5 (0->7 Bus): 1 pool paths
+   P6 (0->7 Car/Micro): 1 pool paths
+   P7 (0->7 Rick/Van/Bike): 1 pool paths
+   P8 (0->3 Truck): 1 pool paths
+   P9 (0->3 Bus): 1 pool paths
+   P10 (0->3 Car/Micro): 1 pool paths
+   P11 (0->3 Rick/Van/Bike): 1 pool paths
+   P12 (1->8 Truck): 1 pool paths
+   P13 (1->8 Bus): 1 pool paths
+   P14 (1->8 Car/Micro): 5 pool paths
+   P15 (1->8 Rick/Van/Bike): 5 pool paths
+   P16 (1->9 Truck): 1 pool paths
+   P17 (1->9 Bus): 1 pool paths
+   P18 (1->9 Car/Micro): 2 pool paths
+   P19 (1->9 Rick/Van/Bike): 2 pool paths
+   P20 (2->8 Truck): 1 pool paths
+   P21 (2->8 Bus): 1 pool paths
+   P22 (2->8 Car/Micro): 2 pool paths
+   P23 (2->8 Rick/Van/Bike): 4 pool paths
+   P24 (2->9 Truck): 1 pool paths
+   P25 (2->9 Bus): 1 pool paths
+   P26 (2->9 Car/Micro): 4 pool paths
+   P27 (2->9 Rick/Van/Bike): 4 pool paths
+   P28 (3->9 Truck): 1 pool paths
+   P29 (3->9 Bus): 1 pool paths
+   P30 (3->9 Car/Micro): 3 pool paths
+   P31 (3->9 Rick/Van/Bike): 1 pool paths
+   P32 (4->7 Truck): 1 pool paths
+   P33 (4->7 Bus): 1 pool paths
+   P34 (4->7 Car/Micro): 3 pool paths
+   P35 (4->7 Rick/Van/Bike): 3 pool paths
+   P36 (4->9 Truck): 1 pool paths
+   P37 (4->9 Bus): 1 pool paths
+   P38 (4->9 Car/Micro): 1 pool paths
+   P39 (4->9 Rick/Van/Bike): 1 pool paths
+   P40 (5->9 Truck): 1 pool paths
+   P41 (5->9 Bus): 1 pool paths
+   P42 (5->9 Car/Micro): 2 pool paths
+   P43 (5->9 Rick/Van/Bike): 1 pool paths
+   P44 (6->9 Truck): 1 pool paths
+   P45 (6->9 Bus): 1 pool paths
+   P46 (6->9 Car/Micro): 1 pool paths
+   P47 (6->9 Rick/Van/Bike): 1 pool paths
+   P48 (7->0 Truck): 1 pool paths
+   P49 (7->0 Bus): 1 pool paths
+   P50 (7->0 Car/Micro): 3 pool paths
+   P51 (7->0 Rick/Van/Bike): 2 pool paths
+   P52 (7->9 Truck): 1 pool paths
+   P53 (7->9 Bus): 1 pool paths
+   P54 (7->9 Car/Micro): 1 pool paths
+   P55 (7->9 Rick/Van/Bike): 1 pool paths
+   P56 (8->1 Truck): 1 pool paths
+   P57 (8->1 Bus): 1 pool paths
+   P58 (8->1 Car/Micro): 1 pool paths
+   P59 (8->1 Rick/Van/Bike): 1 pool paths
+   P60 (9->0 Truck): 1 pool paths
+   P61 (9->0 Bus): 1 pool paths
+   P62 (9->0 Car/Micro): 1 pool paths
+   P63 (9->0 Rick/Van/Bike): 2 pool paths
+   P64 (9->3 Truck): 1 pool paths
+   P65 (9->3 Bus): 1 pool paths
+   P66 (9->3 Car/Micro): 4 pool paths
+   P67 (9->3 Rick/Van/Bike): 5 pool paths
+
+   Total pool paths across all pairs: 107
+
+3. VEHICLE CATEGORY BREAKDOWN
+   Truck: 17/17 reached
+   Bus: 17/17 reached
+   Car/Micro: 15/17 reached
+   Rick/Van/Bike: 13/17 reached

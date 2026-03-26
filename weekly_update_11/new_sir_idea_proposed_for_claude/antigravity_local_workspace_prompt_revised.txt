@@ -1,0 +1,319 @@
+You are acting as a careful research engineer and coding assistant inside Antigravity / Claude Opus.
+
+The detailed combined supervisor flowchart is the authoritative process definition for this task.
+Your implementation plan, architecture, code changes, and output files must follow that flowchart stage-by-stage.
+Do not simplify away the original fine-grained ACO logic.
+If any narrative sentence appears to conflict with the flowchart, follow the flowchart and clearly note the conflict.
+
+BASELINE REPOSITORY AND LOCAL EXECUTION RULE
+The original thesis repository reference is:
+https://github.com/souravdebnath109/Thesis/tree/main/weekly_update_10
+
+However, this GitHub path is only a reference to the source project.
+Because you are running inside Antigravity on the local machine and the weekly_update_10 folder is already present locally, do not begin by searching GitHub.
+Treat the local weekly_update_10 directory in the current workspace as the authoritative working copy.
+Read the local folder structure first, inspect the local files first, and implement changes against the local workspace copy.
+Use the GitHub URL only as a provenance reference if needed, not as the primary place to inspect files.
+If a required file is missing locally, note that clearly as a missing-local-file issue before falling back to any remote reference.
+
+The local folder is expected to contain the current dynamic path-planning work, including files such as:
+- pso_aco_planner.cpp
+- pso_aco_planner_fixed.cpp
+- generate_dataset.py
+- config.txt
+- map_data.csv
+- sd_pairs.csv
+- INSTRUCTIONS.md
+- node_connectivity_graph.png
+- latest_flowchart.png
+- prior result and report files
+
+Read the local repository first, understand what is already implemented, and extend it carefully instead of rewriting everything blindly.
+
+NON-NEGOTIABLE WORKING STYLE
+1. Do not make unsupported claims.
+2. If something is an assumption, label it clearly as an assumption.
+3. Do not say Case 3 is already better unless the experiments prove it.
+4. Preserve reproducibility as much as possible.
+5. Keep new logic configurable through data or config files where possible.
+6. Prefer clear modular code and explicit output files.
+7. Keep the original improved ACO plus combined optimization backbone, while extending it into a vehicle-aware, blockage-aware, pool-based rerouting framework.
+
+RESEARCH CONTEXT
+The old work was dynamic path planning with improved ACO and combined route optimization.
+The revised supervisor-directed focus is:
+
+When a route is suddenly blocked, a link is broken, or a protest closes a road in an unplanned megacity like Dhaka, how quickly can vehicles be rerouted through category-wise feasible alternative paths?
+
+This is not only a “best path under normal traffic” problem.
+It must model:
+- road hierarchy
+- route width
+- road condition
+- vehicle-category feasibility
+- pair-level routing
+- combined network behavior
+- sudden disruption handling
+- comparison of three online rerouting cases
+
+VEHICLE CATEGORIES
+Category 1: Truck
+Category 2: Bus (predefined corridors / allowed bus roads only)
+Category 3: Private car, Microbus
+Category 4: Rickshaw, Van, Bike
+
+ROUTE HIERARCHY
+Main route
+Link route
+Subroute
+Mini route
+
+ACCESS LOGIC
+- Not all routes are suitable for all vehicles.
+- Truck and bus cannot use every route type.
+- Bus must respect predefined bus corridors.
+- Private car and microbus can use more routes than truck and bus, but still not every route.
+- Rickshaw, van, and bike can use all route types unless an explicit restriction is configured.
+- Route width, road condition, and category-wise access must be enforced before a path is accepted.
+
+FLOWCHART-ALIGNED CONTROL LOGIC
+
+TOP-LEVEL INITIALIZATION
+Implement the top-level pipeline in this order so the code and notes match the flowchart:
+
+1. Load config, map data, S-D pairs, bus predefined corridors, and disruption priors.
+2. Compute initial road condition factors:
+   R_i(t) = d_i * (1 + C_i)
+   where d_i is the base distance / travel cost and C_i is the condition or congestion modifier already supported or to be added.
+3. Validate S-D pairs and build vehicle-feasible graph(s).
+4. Classify each edge by:
+   - road type: main / link / sub / mini
+   - route width
+   - road condition
+   - historical fragility / disruption prior
+5. Define category-wise access rules for all vehicle categories.
+
+STEP A: INDEPENDENT OPTIMIZATION + STEADY-STATE POOL PREPARATION
+This stage must preserve the original fine-grained improved-ACO logic while adding vehicle feasibility and pools.
+
+For each source-destination pair and vehicle category, independently:
+
+A1. Create a feasible subgraph after route-width and access filtering.
+
+A2. PHASE 1 - Initial pathfinding
+- Run improved ACO with fixed alpha, beta, rho.
+- Use R_i(t) instead of static distance d wherever the original logic allows.
+- Generate the initial stable besttour.
+
+A3. Generate pair-level pool P(s,d,v) of exactly 5 feasible alternative paths, sorted from best to worst.
+
+A4. Dynamic monitoring over time:
+- update R_i(t)
+- update local congestion
+- update pool feasibility
+
+A5. Trigger condition
+The Step A online/local trigger must be represented explicitly.
+Trigger when one or more of the following occurs:
+- Delta R_i exceeds a threshold
+- a blocked edge appears
+- the current besttour becomes infeasible
+- a pooled candidate becomes infeasible
+
+A6. If the trigger condition is false:
+- proceed on the existing besttour
+- keep the current pool order
+
+A7. If the trigger condition is true:
+- re-plan on the vehicle-feasible graph and/or query the pool
+- compute a candidate newtour
+
+A8. Keep the original decision logic explicit:
+- evaluate whether the newtour is better and still feasible
+- preserve the idea of category/path constraints
+- if needed, preserve the original “cost so far / traversed path” style logic rather than replacing it with a vague summary
+
+A9. If the newtour is accepted:
+- update besttour = newtour
+- update pool order / ranking
+- update the running cost state used by the original algorithm
+
+A10. Traverse the next road segment along the selected tour.
+
+A11. Check whether the endpoint has been reached.
+
+A12. Save pair result:
+- stable best route
+- pair-level pool
+- relevant metadata
+
+IMPORTANT
+Do not compress Step A into a single generic “compute routes” paragraph.
+The detailed loop matters because the supervisor flowchart explicitly keeps:
+- besttour
+- candidate newtour
+- trigger condition
+- accept/reject logic
+- traverse-next-segment
+- reached-endpoint check
+
+STEP B: COMBINED ROUTE OPTIMIZATION + NETWORK-LEVEL POOL
+After pair-level processing, implement the network-level combined stage.
+
+B1. If combined_opt is enabled, iterate over combined iteration k.
+
+B2. In each combined iteration:
+- apply aggregate traffic on shared edges
+- use frequency-based weight increase on shared edges
+- keep category restrictions active
+
+B3. For each S-D pair:
+- run the single-pair logic again as needed
+- keep the ACO + dynamic replanning connection
+- update the pair pool if ranking changes
+
+B4. Compute iteration statistics including at least:
+- avg_cost
+- cost_change percentage
+- route_changes
+- pool_changes
+
+B5. Stabilization check:
+- continue until cost_change is below the stability threshold
+- use 5 percent as the default threshold unless the repository already uses a better configurable value
+
+B6. Save combined results and comparison report:
+- combined stable network
+- shared-edge usage
+- network-level pool information
+
+STEP C: ONLINE DISRUPTION RESPONSE AND CASE COMPARISON
+This stage begins after the stable network and pools already exist.
+
+C1. Real-time monitoring should detect:
+- sudden block
+- broken link
+- protest
+- emergency closure
+
+C2. Identify:
+- blocked edge(s)
+- all affected S-D pairs
+- affected current positions
+- vehicle category
+
+C3. Compare the following three online response cases for all relevant S-D pairs and categories, not only one example.
+
+CASE 1: Source-based reroute
+- remove blocked edge(s)
+- replan from the source on the vehicle-feasible graph
+
+CASE 2: Current-position reroute
+- assume the vehicle has already progressed toward or near the blocked area
+- increase weights around the blocked / congested area
+- replan from the current node or current local position
+
+CASE 3: Pool-based reroute (PROPOSED METHOD)
+- query the precomputed pool
+- remove infeasible pooled paths
+- choose the best remaining feasible candidate
+- repair or refresh the pool only if needed
+
+C4. Compare Case 1 vs Case 2 vs Case 3 for each affected pair and for the network using at least:
+- online reroute iterations
+- reroute time / online computation time
+- computation power or energy proxy
+- reroute success / feasible arrival
+- final path cost
+
+C5. Research hypothesis
+Present the following as a hypothesis, not as a proven result:
+Case 3 is expected to achieve the smallest online reroute iterations, reroute time, and computation power while preserving category-wise feasible rerouting.
+
+C6. After the disruption event:
+- update pair-level pools
+- update the combined network state
+- output final stabilized routes
+- output updated pools
+- output the comparison report
+
+HIGH-RISK LINKS / DISRUPTION PRIORS
+During steady-state pool construction, allow some links to carry a higher prior disruption probability.
+Examples such as Shahbagh and Science Lab are illustrative examples only.
+Do not hard-code them as facts unless the data file explicitly provides them.
+This must be a configurable prior-risk / disruption-probability field.
+
+REQUIRED DATA SCHEMA EXTENSIONS
+Extend the edge schema so each edge can store at least:
+- road_class
+- width
+- road_condition
+- allowed vehicle categories or per-category minimum width
+- optional bus corridor flag
+- optional disruption prior / blockage probability
+- any additional fields needed to preserve the original R_i(t)-based logic
+
+REQUIRED OUTPUT FILES
+Please generate or propose a clean output structure such as:
+- pair_stable_routes.csv
+- pair_pools.json or pair_pools.csv
+- pair_metadata.csv
+- network_pool_analysis.txt
+- disruption_events.csv
+- case1_results.csv
+- case2_results.csv
+- case3_results.csv
+- case_comparison_summary.csv
+- reroute_log_case1.txt
+- reroute_log_case2.txt
+- reroute_log_case3.txt
+- updated_flowchart.png or .dot or .mermaid
+- updated_research_notes.md
+
+IMPORTANT NOTE ABOUT POWER
+If actual hardware power measurement is not realistically available in the environment, do not fake it.
+Use a clearly labeled proxy such as:
+- CPU process time
+- fixed-platform runtime proxy
+- estimated energy proxy under controlled assumptions
+
+WHAT I WANT IN YOUR RESPONSE
+Please work in this order:
+
+STEP 1
+Read and summarize the current local weekly_update_10 repository structure and explain the existing logic briefly.
+
+STEP 2
+Propose the revised architecture for the new research problem.
+
+STEP 3
+Specify the exact data schema changes needed for map_data, config, and input files.
+
+STEP 4
+Implement or draft the code changes carefully.
+If you cannot literally edit files in place, provide full replacement files or clearly separated new files.
+
+STEP 5
+Provide the revised flowchart.
+
+STEP 6
+Provide an experiment plan that covers:
+- all source-destination pairs
+- all relevant vehicle categories
+- steady-state evaluation
+- disruption-event evaluation
+- Case 1 / Case 2 / Case 3 comparison
+
+STEP 7
+Explain clearly why Case 3 is expected to reduce online rerouting cost, while still marking it as a hypothesis until measured.
+
+ACADEMIC WRITING PHRASING
+Use academically careful wording such as:
+- proposed method
+- expected to reduce online rerouting cost
+- to be validated experimentally
+- category-wise feasible rerouting
+- pair-level and network-level resilience
+
+FINAL GOAL
+Help turn the existing improved-ACO dynamic path-planning code into a vehicle-aware, blockage-aware, pool-based alternative path-planning framework for Dhaka that follows the detailed supervisor flowchart, preserves the original fine-grained ACO logic, and compares Case 1, Case 2, and Case 3 across all source-destination pairs and relevant vehicle categories.

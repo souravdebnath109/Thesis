@@ -1,0 +1,4 @@
+event_id,blocked_from,blocked_to,event_type,description
+1,5,9,protest,Road blocked by sudden protest near node 5-9 corridor
+2,4,8,broken_link,Bridge structural failure on edge 4-8
+3,5,6,emergency_closure,Emergency road closure on central corridor 5-6

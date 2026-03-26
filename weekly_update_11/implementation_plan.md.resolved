@@ -1,0 +1,271 @@
+# Vehicle-Aware Pool-Based Rerouting Framework for Dhaka
+
+Extending the existing improved-ACO dynamic path-planning code into a vehicle-aware, blockage-aware, pool-based alternative path-planning framework. The authoritative control logic is the **detailed combined supervisor flowchart**.
+
+## Existing Code Summary (Step 1)
+
+The `weekly_update_10` codebase consists of:
+
+| File | Purpose |
+|------|---------|
+| [pso_aco_planner.cpp](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/pso_aco_planner.cpp) | Main planner with PSO→ACO→Dynamic Re-planning (1565 lines) |
+| [pso_aco_planner_fixed.cpp](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/pso_aco_planner_fixed.cpp) | Fixed-param variant for comparison (1813 lines) |
+| [config.txt](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/config.txt) | Parameters: PSO tuning, ACO, triggers, combined optimization |
+| [map_data.csv](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/map_data.csv) | 10-node network, 31 directed edges (from,to,length,lanes,f_current,f_in,f_out) |
+| [sd_pairs.csv](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/sd_pairs.csv) | 17 source-destination pairs |
+| [generate_dataset.py](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/generate_dataset.py) | Generates map_data.csv, nodes.csv, sd_pairs.csv |
+
+**Existing pipeline:**
+1. **PSO** tunes ACO parameters (α, β, ρ) per S-D pair
+2. **ACO** finds initial besttour using R_i(t) = d_i × (1 + C_i)
+3. **Dynamic Re-planning** loop: update traffic → trigger check (ΔR > threshold or R > max) → replan via ACO → accept/reject newtour → traverse → endpoint check
+4. **Combined Optimization** (Step B): iterates over all pairs, applies aggregate traffic on shared edges, re-runs until stabilized
+
+**What exists vs. what's needed:**
+- ✅ R_i(t) road condition factor
+- ✅ PSO→ACO→Dynamic replanning loop with besttour/newtour
+- ✅ Combined optimization with shared-edge traffic
+- ❌ Vehicle categories and access rules
+- ❌ Road hierarchy (main/link/sub/mini)
+- ❌ Route width and road condition attributes
+- ❌ Pool of 5 alternative paths per (s,d,v)
+- ❌ Bus predefined corridors
+- ❌ Disruption priors
+- ❌ Online disruption response (Cases 1/2/3)
+- ❌ Pool-based rerouting (Case 3 — the proposed method)
+
+## Proposed Architecture (Step 2)
+
+The new code will be a **single new C++ file** `vehicle_pool_planner.cpp` in `weekly_update_11`, preserving all original ACO logic while extending it with vehicle-awareness and pool-based rerouting.
+
+```mermaid
+graph TD
+    A[Load Config + Extended Map Data] --> B[Compute R_i_t for all edges]
+    B --> C[Classify edges: road_class, width, condition]
+    C --> D[Define vehicle category access rules]
+    D --> E["Step A: For each (s,d,v) pair"]
+    E --> F[Build vehicle-feasible subgraph]
+    F --> G[ACO with fixed α,β,ρ → besttour]
+    G --> H[Generate pool P of 5 paths]
+    H --> I[Dynamic monitoring loop]
+    I --> J{Trigger?}
+    J -->|No| K[Continue on besttour]
+    J -->|Yes| L[Replan + query pool → newtour]
+    L --> M{newtour better?}
+    M -->|Yes| N[Update besttour, pool]
+    M -->|No| K
+    K --> O[Traverse next segment]
+    O --> P{Endpoint?}
+    P -->|No| I
+    P -->|Yes| Q[Save pair result + pool]
+    Q --> R["Step B: Combined Optimization"]
+    R --> S[Aggregate traffic on shared edges]
+    S --> T[Rerun pairs, update pools]
+    T --> U{Stabilized?}
+    U -->|No| S
+    U -->|Yes| V[Save combined network + pools]
+    V --> W["Step C: Disruption Event"]
+    W --> X[Detect blocked edges, affected pairs]
+    X --> Y[Case 1: Source reroute]
+    X --> Z[Case 2: Current-position reroute]
+    X --> AA[Case 3: Pool-based reroute]
+    Y --> AB[Compare all 3 cases]
+    Z --> AB
+    AA --> AB
+    AB --> AC[Output comparison report]
+```
+
+### Key Design Decisions
+
+1. **New file, not in-place edit** — `vehicle_pool_planner.cpp` in `weekly_update_11` to avoid breaking existing code
+2. **Uses fixed ACO params** (from config) per the flowchart's "fixed α, β, ρ" in Step A Phase 1 — no PSO step in the new framework (PSO was for parameter tuning; the supervisor flowchart shows fixed params)
+3. **Pool generation** uses multiple independent ACO runs with diversity-encouraging pheromone penalties
+4. **Vehicle feasibility** enforced before pathfinding via subgraph filtering
+5. **CPU process time** used as computation power proxy (clearly labeled)
+
+> [!IMPORTANT]
+> The supervisor flowchart shows "fixed α, β, ρ" in Step A Phase 1, not PSO tuning. The original PSO logic is preserved in the codebase but the new framework uses fixed params per the flowchart. If you prefer PSO tuning to remain, please let me know.
+
+## Data Schema Changes (Step 3)
+
+### Extended [map_data.csv](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/map_data.csv)
+
+```diff
+-from_node,to_node,length_m,lanes,f_current,f_in,f_out
++from_node,to_node,length_m,lanes,f_current,f_in,f_out,road_class,width_m,road_condition,cat1_allowed,cat2_allowed,cat3_allowed,cat4_allowed,bus_corridor,disruption_prior
+```
+
+| New Column | Type | Description |
+|------------|------|-------------|
+| `road_class` | int (1-4) | 1=main, 2=link, 3=sub, 4=mini |
+| `width_m` | float | Route width in meters |
+| [road_condition](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/pso_aco_planner_fixed.cpp#261-264) | float (0-1) | 0=perfect, 1=worst |
+| `cat1_allowed` | 0/1 | Truck access |
+| `cat2_allowed` | 0/1 | Bus access |
+| `cat3_allowed` | 0/1 | Car/Microbus access |
+| `cat4_allowed` | 0/1 | Rickshaw/Van/Bike access |
+| `bus_corridor` | 0/1 | Is this a designated bus corridor? |
+| `disruption_prior` | float (0-1) | Probability of disruption (0=low risk, 1=certain block) |
+
+### Extended [config.txt](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/config.txt)
+
+```
+# ── Vehicle Pool Framework ──────────────────────────────────────
+POOL_SIZE         = 5       # Number of alternative paths per (s,d,v)
+VEHICLE_CATEGORIES = 4      # Number of vehicle categories
+
+# ── Category-wise minimum width (metres) ────────────────────────
+CAT1_MIN_WIDTH    = 6.0     # Truck
+CAT2_MIN_WIDTH    = 5.0     # Bus
+CAT3_MIN_WIDTH    = 3.5     # Car/Microbus
+CAT4_MIN_WIDTH    = 2.0     # Rickshaw/Van/Bike
+
+# ── Disruption parameters ───────────────────────────────────────
+DISRUPTION_BLOCK_WEIGHT = 1000.0  # Weight multiplier for blocked edges
+DISRUPTION_CONGESTION_RADIUS = 2  # Hops around blocked area to increase weight (Case 2)
+CONGESTION_INCREASE    = 3.0      # Multiplier for weights near blocked area
+
+# ── Fixed ACO Parameters (used in the vehicle-pool framework) ──
+FIXED_ALPHA       = 1.0
+FIXED_BETA        = 2.0
+FIXED_RHO         = 0.5
+```
+
+### New files
+
+| File | Purpose |
+|------|---------|
+| [NEW] `bus_corridors.csv` | Predefined bus corridor edge list |
+| [NEW] `disruption_events.csv` | Disruption scenarios (edge, type, time) |
+
+### `disruption_events.csv` schema
+```
+event_id,blocked_from,blocked_to,event_type,description
+1,5,9,protest,Road blocked by protest
+2,4,8,broken_link,Bridge structural failure
+```
+
+---
+
+## Proposed Changes (Step 4)
+
+### Data Generator
+
+#### [MODIFY] [generate_dataset.py](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/generate_dataset.py)
+
+- Extend to generate extended map_data.csv with new columns
+- Generate `bus_corridors.csv` (edges 4→5, 5→6 and reverses marked as bus corridors)
+- Generate `disruption_events.csv` with sample disruption scenarios
+- Add road_class assignment based on edge position (main=widest/central, mini=narrowest/peripheral)
+- Add width, condition, category flags, disruption priors
+
+---
+
+### Core Planner
+
+#### [NEW] [vehicle_pool_planner.cpp](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/vehicle_pool_planner.cpp)
+
+**~2500 lines. Sections:**
+
+1. **Data Structures** — Extended [Edge](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/pso_aco_planner_fixed.cpp#40-48) (with road_class, width, condition, cat access, bus_corridor, disruption_prior), [Config](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/pso_aco_planner.cpp#48-89), [PairResult](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/pso_aco_planner_fixed.cpp#97-107) (with pool), `PoolEntry`, `DisruptionEvent`
+2. **Config Parser** — Extended to parse all new parameters
+3. **CSV Loaders** — Extended [load_map](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/pso_aco_planner.cpp#172-206), new `load_disruption_events`
+4. **Road Condition Factor** — Preserved exactly: R_i(t) = d_i × (1 + C_i(t))
+5. **Vehicle Feasibility** — `build_feasible_subgraph(vehicle_cat, edges, adj)` filters edges by category access and minimum width
+6. **ACO** — Preserved exactly from original, operates on feasible subgraph
+7. **Pool Generation** — `generate_pool(s, d, v, k=5)` runs multiple ACO with pheromone penalties on previously found paths to encourage diversity
+8. **Step A: Independent Optimization + Pool** — Full flowchart loop per (s,d,v):
+   - A1: Feasible subgraph
+   - A2: ACO → besttour
+   - A3: Pool of 5 paths
+   - A4-A5: Dynamic monitoring + trigger
+   - A6-A7: Continue or replan+query pool
+   - A8-A9: Accept/reject newtour
+   - A10: Traverse next segment
+   - A11: Endpoint check
+   - A12: Save pair result
+9. **Step B: Combined Route Optimization** — Preserved from original with pool updates
+10. **Step C: Online Disruption Response** —
+    - C1: Load disruption events
+    - C2: Identify affected pairs
+    - C3: Run all 3 cases:
+      - **Case 1**: Remove blocked edge, replan from source
+      - **Case 2**: Increase weights around blocked area, replan from current position
+      - **Case 3**: Query precomputed pool, select best feasible candidate, repair pool if needed
+    - C4: Compare metrics (iterations, time, energy proxy, success, cost)
+    - C5: Output hypothesis statement
+    - C6: Update pools and network state
+
+---
+
+### Config
+
+#### [NEW] [config.txt](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/config.txt)
+
+Extended config with all new parameters while preserving original structure.
+
+---
+
+### Output Files
+
+All output files written to the `weekly_update_11` directory:
+
+| File | Content |
+|------|---------|
+| `pair_stable_routes.csv` | Best route per (s,d,v) after Step A |
+| `pair_pools.json` | Pool of 5 paths per (s,d,v) |
+| `pair_metadata.csv` | Per-pair metadata (category, pool size, replans) |
+| `network_pool_analysis.txt` | Network-level pool and shared-edge analysis |
+| `disruption_events.csv` | Input disruption scenarios |
+| `case1_results.csv` | Case 1 rerouting results |
+| `case2_results.csv` | Case 2 rerouting results |
+| `case3_results.csv` | Case 3 rerouting results |
+| `case_comparison_summary.csv` | Side-by-side comparison of all 3 cases |
+| `reroute_log_case1.txt` | Detailed rerouting log for Case 1 |
+| `reroute_log_case2.txt` | Detailed rerouting log for Case 2 |
+| `reroute_log_case3.txt` | Detailed rerouting log for Case 3 |
+| `updated_research_notes.md` | Updated research documentation |
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+1. **Compilation test**: 
+   ```
+   cd e:\akhand_sir_research_topic\dorkari\weekly_update_11
+   g++ -std=c++17 -O2 -o vehicle_pool_planner.exe vehicle_pool_planner.cpp
+   ```
+   Expected: compiles without errors.
+
+2. **Generate extended dataset**:
+   ```
+   cd e:\akhand_sir_research_topic\dorkari\weekly_update_11
+   python generate_dataset.py
+   ```
+   Expected: generates [map_data.csv](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/map_data.csv), [nodes.csv](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/nodes.csv), [sd_pairs.csv](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_11/sd_pairs.csv), `bus_corridors.csv`, `disruption_events.csv`
+
+3. **Run the planner**:
+   ```
+   cd e:\akhand_sir_research_topic\dorkari\weekly_update_11
+   vehicle_pool_planner.exe > output.txt 2>&1
+   ```
+   Expected: runs to completion, generates all output files listed above.
+
+4. **Verify output files exist**:
+   ```
+   dir e:\akhand_sir_research_topic\dorkari\weekly_update_11\*.csv
+   dir e:\akhand_sir_research_topic\dorkari\weekly_update_11\*.json
+   dir e:\akhand_sir_research_topic\dorkari\weekly_update_11\*.txt
+   ```
+
+### Manual Verification
+
+1. **Check `case_comparison_summary.csv`** — Should have columns for all three cases with iterations, time, energy proxy, success rate, final cost
+2. **Check `pair_pools.json`** — Each (s,d,v) entry should have exactly 5 paths sorted best-to-worst
+3. **Check that Case 3 results include pool query time** — Should be markedly lower than Case 1/2 ACO computation time
+4. **Review [output.txt](file:///e:/akhand_sir_research_topic/dorkari/weekly_update_10/output.txt)** — Should show the full Step A → Step B → Step C pipeline with clear logging
+
+> [!NOTE]
+> Case 3 is expected to show lower online rerouting iterations and computation time compared to Cases 1 and 2. This is stated as a **hypothesis to be validated experimentally**, not as a proven result.

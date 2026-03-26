@@ -1,0 +1,25 @@
+Dhaka image-derived graph extraction summary
+==========================================
+
+Source image: provided Google Maps screenshot
+Method: road-color extraction -> skeleton -> node/edge tracing -> short-leaf pruning -> width-class assignment
+
+Width classes from visible line width in the screenshot:
+  main : > 6.5 px
+  link : 4.5 to 6.5 px
+  sub  : 3.0 to 4.5 px
+  mini : <= 3.0 px
+
+Nodes retained: 117
+Edges retained: 131
+Edge counts by class:
+  main: 6
+  link: 17
+  sub: 88
+  mini: 20
+
+Files:
+  dhaka_clean_graph_extraction.png/.svg
+  dhaka_graph_overlay.png
+  dhaka_graph_nodes.csv
+  dhaka_graph_edges.csv
