@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ACO Routing Flowchart - Dhaka</title>
+<style>
+body{margin:0;padding:16px;background:#f8f9fa;font-family:Arial,Helvetica,sans-serif;}
+h1{font-size:13px;text-align:center;color:#1e3a8a;max-width:900px;margin:0 auto 4px;}
+p.sub{font-size:11px;text-align:center;color:#6b7280;max-width:900px;margin:0 auto 12px;}
+.wrap{overflow-x:auto;}
+svg text{font-family:Arial,Helvetica,sans-serif;}
+</style>
+</head>
+<body>
+<h1>Detailed Combined Supervisor Flowchart: Original Improved ACO + Vehicle-Aware Pool-Based Alternative Routing for Dhaka</h1>
+<p class="sub">Restores original fine-grained ACO logic while adding vehicle categories, route hierarchy, steady-state pools, and Case 1-2-3 disruption handling.</p>
+<div class="wrap">
+<svg width="1020" height="3120" viewBox="0 0 1020 3120" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M1 1.5 L9 5 L1 8.5" fill="none" stroke="#374151" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M1 1.5 L9 5 L1 8.5" fill="none" stroke="#1e40af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M1 1.5 L9 5 L1 8.5" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- ═══════════════════════════════ START ═══════════════════════════════ -->
+<ellipse cx="510" cy="36" rx="54" ry="22" fill="#1e3a8a" stroke="#1e3a8a"/>
+<text x="510" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="white">START</text>
+
+<line x1="510" y1="58" x2="510" y2="78" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Load config -->
+<rect x="320" y="80" width="380" height="50" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="101" text-anchor="middle" font-size="12" fill="#1e3a8a">Load config, map data, S-D pairs,</text>
+<text x="510" y="118" text-anchor="middle" font-size="12" fill="#1e3a8a">bus predefined corridors, and disruption priority</text>
+
+<line x1="510" y1="130" x2="510" y2="150" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Compute Rc -->
+<rect x="300" y="152" width="420" height="68" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="174" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Compute initial road condition factors</text>
+<text x="510" y="192" text-anchor="middle" font-size="12" fill="#1e3a8a">R_c(t) = α_j × (1 + C_p)</text>
+<text x="510" y="210" text-anchor="middle" font-size="11" fill="#3b82f6">Validate S-D pairs and build vehicle-feasible graph(s)</text>
+
+<line x1="510" y1="220" x2="510" y2="240" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Classify edge -->
+<rect x="300" y="242" width="420" height="68" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="262" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Classify each edge by road type</text>
+<text x="510" y="279" text-anchor="middle" font-size="12" fill="#1e3a8a">(main / link / sub / minor), route width,</text>
+<text x="510" y="296" text-anchor="middle" font-size="12" fill="#1e3a8a">condition, and historical fragility</text>
+
+<line x1="510" y1="310" x2="510" y2="330" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Define category -->
+<rect x="300" y="332" width="420" height="88" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="352" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Define category-wise access roles</text>
+<text x="510" y="370" text-anchor="middle" font-size="12" fill="#1e3a8a">Cat 1: Truck</text>
+<text x="510" y="386" text-anchor="middle" font-size="12" fill="#1e3a8a">Cat 3: Bus (predefined corridors)</text>
+<text x="510" y="402" text-anchor="middle" font-size="12" fill="#1e3a8a">Cat 5: Private car / Minibus  |  Cat 4: Rickshaw / Van / Bike</text>
+
+<line x1="510" y1="420" x2="510" y2="442" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- ══════════════ STEP A HEADER ══════════════ -->
+<rect x="18" y="444" width="980" height="32" rx="4" fill="#1e3a8a" stroke="#1e3a8a"/>
+<text x="510" y="465" text-anchor="middle" font-size="13" font-weight="bold" fill="white">STEP A: INDEPENDENT OPTIMIZATION + STEADY-STATE POOL PREPARATION</text>
+
+<!-- STEP A dashed container -->
+<rect x="18" y="478" width="980" height="870" rx="6" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+<!-- FOR each loop label -->
+<rect x="28" y="486" width="380" height="26" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+<text x="218" y="503" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">FOR each S-D pair and vehicle category (Independent)</text>
+
+<!-- Box: Create feasible subgraph -->
+<rect x="310" y="522" width="400" height="50" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="542" text-anchor="middle" font-size="12" fill="#1e3a8a">Create a feasible subgraph after route-width</text>
+<text x="510" y="559" text-anchor="middle" font-size="12" fill="#1e3a8a">and access filtering</text>
+
+<line x1="510" y1="572" x2="510" y2="592" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: PHASE 1 - Initial Pathfinding (purple) -->
+<rect x="300" y="594" width="420" height="88" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+<text x="510" y="614" text-anchor="middle" font-size="12" font-weight="bold" fill="#4c1d95">PHASE 1 — Initial Pathfinding</text>
+<text x="510" y="632" text-anchor="middle" font-size="12" fill="#4c1d95">Run Improved ACO with fixed α, β, ρ</text>
+<text x="510" y="649" text-anchor="middle" font-size="12" fill="#4c1d95">Use R_c(t) to replace C_ij</text>
+<text x="510" y="667" text-anchor="middle" font-size="12" fill="#4c1d95">Generate initial route best-tour</text>
+
+<line x1="510" y1="682" x2="510" y2="702" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Generate per-pair pool -->
+<rect x="295" y="704" width="430" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="724" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Generate per-pair pool P(s,d,v)</text>
+<text x="510" y="741" text-anchor="middle" font-size="12" fill="#1e3a8a">5 feasible alternative paths, ranked best to worst</text>
+<text x="510" y="758" text-anchor="middle" font-size="11" fill="#3b82f6">(pool stored for online use in disruption events)</text>
+
+<line x1="510" y1="769" x2="510" y2="789" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Dynamic monitoring -->
+<rect x="295" y="791" width="430" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="811" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Dynamic monitoring (k+1)</text>
+<text x="510" y="828" text-anchor="middle" font-size="12" fill="#1e3a8a">Update R_c(t), local congestion,</text>
+<text x="510" y="845" text-anchor="middle" font-size="12" fill="#1e3a8a">and pool feasibility</text>
+
+<line x1="510" y1="856" x2="510" y2="876" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- DIAMOND: Trigger condition -->
+<polygon points="510,876 668,924 510,972 352,924" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text x="510" y="909" text-anchor="middle" font-size="11" font-weight="bold" fill="#78350f">Trigger condition?</text>
+<text x="510" y="924" text-anchor="middle" font-size="11" fill="#78350f">ΔK &gt; threshold OR blocked edge</text>
+<text x="510" y="939" text-anchor="middle" font-size="11" fill="#78350f">OR best path no longer feasible</text>
+
+<!-- NO branch (left) -->
+<line x1="352" y1="924" x2="198" y2="924" stroke="#6b7280" stroke-width="1.5" marker-end="url(#ar3)"/>
+<text x="270" y="915" text-anchor="middle" font-size="11" fill="#374151">No</text>
+
+<!-- Box: Proceed on existing (left) -->
+<rect x="34" y="900" width="162" height="50" rx="6" fill="#f3f4f6" stroke="#6b7280" stroke-width="1.2"/>
+<text x="115" y="920" text-anchor="middle" font-size="11" fill="#374151">Proceed on existing</text>
+<text x="115" y="936" text-anchor="middle" font-size="11" fill="#374151">best-tour + pool order</text>
+
+<!-- YES branch (right) -->
+<line x1="668" y1="924" x2="760" y2="924" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="714" y="915" text-anchor="middle" font-size="11" fill="#374151">Yes</text>
+
+<!-- Box: Re-plan on vehicle-feasible graph (right) -->
+<rect x="762" y="898" width="220" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="872" y="918" text-anchor="middle" font-size="11" font-weight="bold" fill="#1e3a8a">Re-plan on vehicle-feasible graph</text>
+<text x="872" y="934" text-anchor="middle" font-size="11" fill="#1e3a8a">/ query pool</text>
+<text x="872" y="950" text-anchor="middle" font-size="11" fill="#1e3a8a">Compute candidate bestour</text>
+
+<!-- Down from Re-plan -->
+<line x1="872" y1="963" x2="872" y2="986" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- DIAMOND: Is bestour better (right column) -->
+<polygon points="872,986 982,1026 872,1066 762,1026" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text x="872" y="1014" text-anchor="middle" font-size="10" font-weight="bold" fill="#78350f">Is bestour better</text>
+<text x="872" y="1028" text-anchor="middle" font-size="10" fill="#78350f">and still feasible?</text>
+<text x="872" y="1042" text-anchor="middle" font-size="10" fill="#78350f">bestour &lt; besttour − ε_p</text>
+
+<!-- YES from diamond -->
+<line x1="872" y1="1066" x2="872" y2="1090" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="884" y="1082" font-size="11" fill="#374151">Yes</text>
+
+<!-- Box: Update bestour (right) -->
+<rect x="762" y="1092" width="220" height="65" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.2"/>
+<text x="872" y="1112" text-anchor="middle" font-size="11" font-weight="bold" fill="#064e3b">Update bestour = bestour</text>
+<text x="872" y="1128" text-anchor="middle" font-size="11" fill="#064e3b">Update pool order</text>
+<text x="872" y="1144" text-anchor="middle" font-size="11" fill="#064e3b">α_j = α_j + R_c(t)</text>
+
+<!-- NO from diamond (up and left) -->
+<line x1="762" y1="1026" x2="720" y2="1026" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="720" y1="1026" x2="720" y2="960" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="720" y1="960" x2="765" y2="960" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar3)"/>
+<text x="705" y="993" font-size="10" fill="#6b7280" text-anchor="end">No</text>
+
+<!-- Merge both branches down to Traverse -->
+<!-- From NO (left box) down to join -->
+<line x1="115" y1="950" x2="115" y2="1175" stroke="#374151" stroke-width="1.2"/>
+<line x1="115" y1="1175" x2="307" y2="1175" stroke="#374151" stroke-width="1.2" marker-end="url(#ar)"/>
+
+<!-- From YES (update bestour box) down to join -->
+<line x1="872" y1="1157" x2="872" y2="1175" stroke="#374151" stroke-width="1.2"/>
+<line x1="872" y1="1175" x2="713" y2="1175" stroke="#374151" stroke-width="1.2" marker-end="url(#ar)"/>
+
+<!-- Also from trigger NO — but actually NO goes to its own box and both eventually reach Traverse -->
+<!-- Main flow arrow from trigger YES path rejoins too -->
+<!-- Down from Diamond (trigger) if YES path eventually merges down - already handled -->
+<!-- Main center arrow: from trigger diamond bottom to traverse box (for NO path from existing box too) -->
+<line x1="510" y1="972" x2="510" y2="1177" stroke="#374151" stroke-width="1.2" marker-end="url(#ar)"/>
+
+<!-- Box: Traverse next road segment -->
+<rect x="308" y="1178" width="404" height="50" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="1198" text-anchor="middle" font-size="12" fill="#1e3a8a">Traverse next road segment</text>
+<text x="510" y="1215" text-anchor="middle" font-size="12" fill="#1e3a8a">along selected tour</text>
+
+<line x1="510" y1="1228" x2="510" y2="1248" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- DIAMOND: Reached endpoint? -->
+<polygon points="510,1248 648,1284 510,1320 372,1284" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text x="510" y="1278" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Reached</text>
+<text x="510" y="1296" text-anchor="middle" font-size="12" fill="#78350f">endpoint?</text>
+
+<!-- NO: loop back up the right side -->
+<line x1="648" y1="1284" x2="960" y2="1284" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3"/>
+<line x1="960" y1="1284" x2="960" y2="791" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3"/>
+<line x1="960" y1="791" x2="727" y2="791" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#ar3)"/>
+<text x="810" y="1274" font-size="11" fill="#6b7280">No — continue tour</text>
+
+<!-- YES: down to save -->
+<line x1="510" y1="1320" x2="510" y2="1340" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="522" y="1334" font-size="11" fill="#374151">Yes</text>
+
+<!-- Box: Save pair result -->
+<rect x="295" y="1342" width="430" height="65" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+<text x="510" y="1362" text-anchor="middle" font-size="12" font-weight="bold" fill="#064e3b">Save pair result</text>
+<text x="510" y="1379" text-anchor="middle" font-size="12" fill="#064e3b">Store best route = pair-best-pair + metadata</text>
+<text x="510" y="1396" text-anchor="middle" font-size="11" fill="#065f46">best_route, pool P(s,d,v), variables</text>
+
+<!-- Side notes for Step A -->
+<rect x="30" y="594" width="260" height="100" rx="6" fill="#fefce8" stroke="#ca8a04" stroke-width="1"/>
+<text x="40" y="610" font-size="10" font-weight="bold" fill="#713f12">Architecture note</text>
+<text x="40" y="624" font-size="10" fill="#713f12">All pairs / all operations run</text>
+<text x="40" y="637" font-size="10" fill="#713f12">independently across each run.</text>
+<text x="40" y="650" font-size="10" fill="#713f12">Pathfinding runs dynamic in planning,</text>
+<text x="40" y="663" font-size="10" fill="#713f12">restricts updates to solve a criterion</text>
+<text x="40" y="676" font-size="10" fill="#713f12">down independently (more likely).</text>
+
+<rect x="30" y="1060" width="260" height="90" rx="6" fill="#fefce8" stroke="#ca8a04" stroke-width="1"/>
+<text x="40" y="1076" font-size="10" font-weight="bold" fill="#713f12">Population note</text>
+<text x="40" y="1090" font-size="10" fill="#713f12">Initial seed pool best route (more</text>
+<text x="40" y="1103" font-size="10" fill="#713f12">likely to survive a higher boundary</text>
+<text x="40" y="1116" font-size="10" fill="#713f12">when using local pool, considers</text>
+<text x="40" y="1129" font-size="10" fill="#713f12">queue only).</text>
+
+<!-- Bottom of Step A dashed box -->
+<line x1="510" y1="1407" x2="510" y2="1427" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- ══════════════ STEP B HEADER ══════════════ -->
+<rect x="18" y="1430" width="980" height="32" rx="4" fill="#1e3a8a" stroke="#1e3a8a"/>
+<text x="510" y="1451" text-anchor="middle" font-size="13" font-weight="bold" fill="white">STEP B: COMBINED ROUTE OPTIMIZATION + NETWORK-LEVEL POOL</text>
+
+<!-- STEP B dashed container -->
+<rect x="18" y="1464" width="980" height="560" rx="6" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+<!-- Small note top-left of Step B -->
+<rect x="28" y="1472" width="180" height="28" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+<text x="118" y="1490" text-anchor="middle" font-size="11" fill="#1e3a8a">network_level_pool_enabled</text>
+
+<!-- DIAMOND: combined_opt enabled? -->
+<polygon points="510,1476 640,1510 510,1544 380,1510" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text x="510" y="1500" text-anchor="middle" font-size="11" font-weight="bold" fill="#78350f">combined_opt</text>
+<text x="510" y="1517" text-anchor="middle" font-size="11" fill="#78350f">enabled?</text>
+
+<!-- YES arrow down -->
+<line x1="510" y1="1544" x2="510" y2="1566" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="522" y="1560" font-size="11" fill="#374151">Yes</text>
+
+<!-- NO arrow right — skip to end of Step B -->
+<line x1="640" y1="1510" x2="990" y2="1510" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3"/>
+<line x1="990" y1="1510" x2="990" y2="2020" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3"/>
+<line x1="990" y1="2020" x2="715" y2="2020" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#ar3)"/>
+<text x="820" y="1502" font-size="11" fill="#6b7280">No — skip</text>
+
+<!-- FOR each combined iteration k -->
+<rect x="28" y="1570" width="240" height="26" rx="4" fill="#d1fae5" stroke="#059669" stroke-width="1"/>
+<text x="148" y="1587" text-anchor="middle" font-size="12" font-weight="bold" fill="#064e3b">FOR each combined iteration k</text>
+
+<!-- Box: Apply aggregate traffic -->
+<rect x="295" y="1568" width="430" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="1588" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Apply aggregate traffic on shared edges</text>
+<text x="510" y="1605" text-anchor="middle" font-size="12" fill="#1e3a8a">Frequency-based weight increase</text>
+<text x="510" y="1622" text-anchor="middle" font-size="12" fill="#1e3a8a">+ category restrictions</text>
+
+<line x1="510" y1="1633" x2="510" y2="1653" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: FOR each S-D pair -->
+<rect x="295" y="1655" width="430" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="1675" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">FOR each S-D pair:</text>
+<text x="510" y="1692" text-anchor="middle" font-size="12" fill="#1e3a8a">run_single_pair (ACO + dynamic replanning)</text>
+<text x="510" y="1709" text-anchor="middle" font-size="12" fill="#1e3a8a">S-D update pair pool if ranking changes</text>
+
+<line x1="510" y1="1720" x2="510" y2="1740" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Compute iteration statistics -->
+<rect x="295" y="1742" width="430" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="1762" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Compute iteration statistics</text>
+<text x="510" y="1779" text-anchor="middle" font-size="12" fill="#1e3a8a">avg_cost, cost_change,</text>
+<text x="510" y="1796" text-anchor="middle" font-size="12" fill="#1e3a8a">n_node_changes, and pool_changes</text>
+
+<line x1="510" y1="1807" x2="510" y2="1827" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- DIAMOND: Stabilized? -->
+<polygon points="510,1827 648,1865 510,1903 372,1865" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text x="510" y="1857" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Stabilized?</text>
+<text x="510" y="1876" text-anchor="middle" font-size="11" fill="#78350f">apct_change &lt; S_th</text>
+
+<!-- NO: loop back to Apply aggregate -->
+<line x1="372" y1="1865" x2="50" y2="1865" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3"/>
+<line x1="50" y1="1865" x2="50" y2="1590" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3"/>
+<line x1="50" y1="1590" x2="293" y2="1590" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#ar3)"/>
+<text x="30" y="1730" font-size="10" fill="#6b7280" text-anchor="middle">No</text>
+
+<!-- YES: down to save -->
+<line x1="510" y1="1903" x2="510" y2="1923" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="522" y="1917" font-size="11" fill="#374151">Yes</text>
+
+<!-- Box: Save combined results -->
+<rect x="260" y="1925" width="500" height="82" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+<text x="510" y="1946" text-anchor="middle" font-size="12" font-weight="bold" fill="#064e3b">Save combined results and comparison report</text>
+<text x="510" y="1963" text-anchor="middle" font-size="12" fill="#064e3b">Combined stable network, shared-edge usage,</text>
+<text x="510" y="1980" text-anchor="middle" font-size="12" fill="#064e3b">and network-level pool information</text>
+<text x="510" y="1997" text-anchor="middle" font-size="11" fill="#065f46">(routed, pool P, variables)</text>
+
+<line x1="510" y1="2007" x2="510" y2="2027" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- ══════════════ STEP C HEADER ══════════════ -->
+<rect x="18" y="2030" width="980" height="32" rx="4" fill="#1e3a8a" stroke="#1e3a8a"/>
+<text x="510" y="2051" text-anchor="middle" font-size="13" font-weight="bold" fill="white">STEP C: ONLINE DISRUPTION RESPONSE AND CASE COMPARISON</text>
+
+<!-- STEP C dashed container -->
+<rect x="18" y="2064" width="980" height="1006" rx="6" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+<!-- Small note label -->
+<rect x="28" y="2070" width="380" height="20" rx="3" fill="#fef3c7" stroke="#d97706" stroke-width="0.8"/>
+<text x="218" y="2083" text-anchor="middle" font-size="10" fill="#78350f">Vehicle-aware | 3-case online response | Pool-first (Case 3)</text>
+
+<!-- Box: Real-time monitoring -->
+<rect x="270" y="2098" width="480" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="2118" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Real-time monitoring</text>
+<text x="510" y="2135" text-anchor="middle" font-size="12" fill="#1e3a8a">Detect sudden block, broken link,</text>
+<text x="510" y="2152" text-anchor="middle" font-size="12" fill="#1e3a8a">protest, or emergency closure</text>
+
+<line x1="510" y1="2163" x2="510" y2="2183" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Identify blocked edges -->
+<rect x="270" y="2185" width="480" height="65" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="510" y="2205" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Identify blocked edge(s)</text>
+<text x="510" y="2222" text-anchor="middle" font-size="12" fill="#1e3a8a">All affected S-D pairs, affected current positions,</text>
+<text x="510" y="2239" text-anchor="middle" font-size="12" fill="#1e3a8a">and vehicle category</text>
+
+<line x1="510" y1="2250" x2="510" y2="2270" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- DIAMOND: Which online response case? -->
+<polygon points="510,2270 700,2322 510,2374 320,2322" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text x="510" y="2308" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Which online</text>
+<text x="510" y="2326" text-anchor="middle" font-size="12" fill="#78350f">response case?</text>
+<text x="510" y="2343" text-anchor="middle" font-size="11" fill="#78350f">Select based on strategy</text>
+
+<!-- Three branch arrows -->
+<!-- CASE 3 — far left -->
+<line x1="320" y1="2322" x2="160" y2="2322" stroke="#374151" stroke-width="1.5"/>
+<line x1="160" y1="2322" x2="160" y2="2394" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="235" y="2312" text-anchor="middle" font-size="11" fill="#374151">Case 3</text>
+
+<!-- CASE 2 — center (slight right of center) -->
+<line x1="510" y1="2374" x2="510" y2="2394" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="522" y="2388" font-size="11" fill="#374151">Case 2</text>
+
+<!-- CASE 1 — right -->
+<line x1="700" y1="2322" x2="850" y2="2322" stroke="#374151" stroke-width="1.5"/>
+<line x1="850" y1="2322" x2="850" y2="2394" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="778" y="2312" text-anchor="middle" font-size="11" fill="#374151">Case 1</text>
+
+<!-- CASE 3 (PROPOSED) box — green -->
+<rect x="28" y="2396" width="262" height="145" rx="6" fill="#d1fae5" stroke="#16a34a" stroke-width="2"/>
+<text x="159" y="2416" text-anchor="middle" font-size="12" font-weight="bold" fill="#064e3b">CASE 3 (PROPOSED)</text>
+<text x="159" y="2432" text-anchor="middle" font-size="11" fill="#064e3b">Pool-first reroute:</text>
+<text x="159" y="2448" text-anchor="middle" font-size="11" fill="#064e3b">1. Run reroute routine</text>
+<text x="159" y="2463" text-anchor="middle" font-size="11" fill="#064e3b">2. Query precomputed pool</text>
+<text x="159" y="2478" text-anchor="middle" font-size="11" fill="#064e3b">3. Remove infeasible paths</text>
+<text x="159" y="2493" text-anchor="middle" font-size="11" fill="#064e3b">4. Select best feasible candidate</text>
+<text x="159" y="2508" text-anchor="middle" font-size="11" fill="#064e3b">5. Repair/update pool if needed</text>
+<text x="159" y="2526" text-anchor="middle" font-size="10" fill="#065f46">(least compute, pool preserves feasibility)</text>
+
+<!-- CASE 2 box — amber/orange -->
+<rect x="354" y="2396" width="312" height="145" rx="6" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="510" y="2416" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">CASE 2</text>
+<text x="510" y="2432" text-anchor="middle" font-size="11" fill="#92400e">Current position reroute:</text>
+<text x="510" y="2448" text-anchor="middle" font-size="11" fill="#92400e">1. Increase weights around</text>
+<text x="510" y="2464" text-anchor="middle" font-size="11" fill="#92400e">   blocked area (congestion)</text>
+<text x="510" y="2480" text-anchor="middle" font-size="11" fill="#92400e">2. Replan from current node</text>
+<text x="510" y="2496" text-anchor="middle" font-size="11" fill="#92400e">3. Use updated ACO weights</text>
+<text x="510" y="2526" text-anchor="middle" font-size="10" fill="#b45309">(medium compute, local knowledge)</text>
+
+<!-- CASE 1 box — gray/white -->
+<rect x="730" y="2396" width="256" height="145" rx="6" fill="#f9fafb" stroke="#6b7280" stroke-width="1.5"/>
+<text x="858" y="2416" text-anchor="middle" font-size="12" font-weight="bold" fill="#111827">CASE 1</text>
+<text x="858" y="2432" text-anchor="middle" font-size="11" fill="#111827">Source-based reroute:</text>
+<text x="858" y="2448" text-anchor="middle" font-size="11" fill="#111827">1. Remove blocked edge(s)</text>
+<text x="858" y="2464" text-anchor="middle" font-size="11" fill="#111827">2. Replan from source on</text>
+<text x="858" y="2480" text-anchor="middle" font-size="11" fill="#111827">   vehicle-feasible graph</text>
+<text x="858" y="2496" text-anchor="middle" font-size="11" fill="#374151">3. Full ACO re-run</text>
+<text x="858" y="2526" text-anchor="middle" font-size="10" fill="#6b7280">(highest compute, full search)</text>
+
+<!-- Merge all three cases down -->
+<line x1="159" y1="2541" x2="159" y2="2580" stroke="#374151" stroke-width="1.2"/>
+<line x1="159" y1="2580" x2="510" y2="2580" stroke="#374151" stroke-width="1.2" marker-end="url(#ar)"/>
+
+<line x1="510" y1="2541" x2="510" y2="2580" stroke="#374151" stroke-width="1.2"/>
+
+<line x1="858" y1="2541" x2="858" y2="2580" stroke="#374151" stroke-width="1.2"/>
+<line x1="858" y1="2580" x2="512" y2="2580" stroke="#374151" stroke-width="1.2"/>
+
+<line x1="510" y1="2580" x2="510" y2="2598" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Compare Case 1 vs Case 2 vs Case 3 -->
+<rect x="180" y="2600" width="660" height="88" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+<text x="510" y="2620" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Compare Case 1 vs Case 2 vs Case 3</text>
+<text x="510" y="2637" text-anchor="middle" font-size="12" fill="#1e3a8a">For each affected pair and the network:</text>
+<text x="510" y="2654" text-anchor="middle" font-size="12" fill="#1e3a8a">online deviation | compute time | computation power</text>
+<text x="510" y="2671" text-anchor="middle" font-size="12" fill="#1e3a8a">strategy proxy | business rule | final path cost</text>
+
+<line x1="510" y1="2688" x2="510" y2="2708" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Research hypothesis -->
+<rect x="180" y="2710" width="660" height="68" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+<text x="510" y="2730" text-anchor="middle" font-size="12" font-weight="bold" fill="#78350f">Research hypothesis</text>
+<text x="510" y="2748" text-anchor="middle" font-size="12" fill="#78350f">Case 3 should achieve the smallest online iterations,</text>
+<text x="510" y="2765" text-anchor="middle" font-size="12" fill="#78350f">time, and power while preserving category-wise feasibility</text>
+
+<line x1="510" y1="2778" x2="510" y2="2798" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- Box: Update per-visit pools -->
+<rect x="180" y="2800" width="660" height="88" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+<text x="510" y="2820" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Update per-visit pools and the combined network state</text>
+<text x="510" y="2837" text-anchor="middle" font-size="12" fill="#1e3a8a">after the disruption event</text>
+<text x="510" y="2855" text-anchor="middle" font-size="12" fill="#1e3a8a">Output final stabilized routes, updated pools,</text>
+<text x="510" y="2872" text-anchor="middle" font-size="12" fill="#1e3a8a">and the comparison report</text>
+
+<line x1="510" y1="2888" x2="510" y2="2910" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<!-- ════════════════════ END ════════════════════ -->
+<ellipse cx="510" cy="2940" rx="54" ry="24" fill="#1e3a8a" stroke="#1e3a8a"/>
+<text x="510" y="2948" text-anchor="middle" font-size="16" font-weight="bold" fill="white">END</text>
+
+<!-- ════════ LEGEND ════════ -->
+<rect x="18" y="2980" width="980" height="128" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="510" y="2998" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Legend</text>
+<rect x="40" y="3010" width="30" height="18" rx="4" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+<text x="78" y="3022" font-size="11" fill="#374151">Process / Action</text>
+<rect x="200" y="3010" width="30" height="18" rx="4" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+<text x="238" y="3022" font-size="11" fill="#374151">Decision (diamond)</text>
+<rect x="400" y="3010" width="30" height="18" rx="4" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+<text x="438" y="3022" font-size="11" fill="#374151">Output / Save</text>
+<rect x="580" y="3010" width="30" height="18" rx="4" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+<text x="618" y="3022" font-size="11" fill="#374151">PHASE 1 (ACO core)</text>
+<rect x="780" y="3010" width="30" height="18" rx="4" fill="#fefce8" stroke="#ca8a04" stroke-width="1"/>
+<text x="818" y="3022" font-size="11" fill="#374151">Side note</text>
+<line x1="40" y1="3055" x2="80" y2="3055" stroke="#374151" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="88" y="3059" font-size="11" fill="#374151">Forward flow</text>
+<line x1="200" y1="3055" x2="240" y2="3055" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#ar3)"/>
+<text x="248" y="3059" font-size="11" fill="#374151">Loop-back / fallback path</text>
+<rect x="440" y="3044" width="100" height="22" rx="4" fill="#d1fae5" stroke="#16a34a" stroke-width="2"/>
+<text x="490" y="3058" text-anchor="middle" font-size="11" fill="#064e3b">Case 3 (proposed)</text>
+<rect x="600" y="3044" width="80" height="22" rx="4" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="640" y="3058" text-anchor="middle" font-size="11" fill="#92400e">Case 2</text>
+<rect x="740" y="3044" width="80" height="22" rx="4" fill="#f9fafb" stroke="#6b7280" stroke-width="1.5"/>
+<text x="780" y="3058" text-anchor="middle" font-size="11" fill="#111827">Case 1</text>
+<text x="510" y="3095" text-anchor="middle" font-size="10" fill="#6b7280">S-D = Source-Destination | ACO = Ant Colony Optimization | R_c = Road condition factor | α_j = Pheromone factor | ε_p = Feasibility tolerance | S_th = Stability threshold</text>
+
+</svg>
+</div>
+</body>
+</html>
