@@ -1,0 +1,14 @@
+# Number of nodes in the network
+NUM_NODES=100
+
+# Number of links (edges)
+NUM_LINKS=1000
+
+# Number of vehicles
+NUM_VEHICLES=10000
+
+# Number of iterations for algorithm
+NUM_ITERATIONS=50
+
+# Random seed (optional, for reproducibility)
+RANDOM_SEED=42
